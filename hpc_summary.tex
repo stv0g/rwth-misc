@@ -141,12 +141,6 @@ All MPI routines return an integer error code!
 	\lstinline$MPI_Finalized(?flag?)$ & Check if MPI runtime was already shut down. \\
 \end{tabular}
 
-\subsubsection{Communicator handling}
-\begin{tabular}{ p{8cm} l }
-	\lstinline$MPI_Comm_rank(§cm§, ?rank?)$ & Get rank/id of current process in this communicator. \\
-	\lstinline$MPI_Comm_size(§cm§, ?size?)$ & Get total number of processes in this communicator. \\
-\end{tabular}
-
 \subsubsection{Point-to-point data transfer}
 
 \begin{tabular}{ l | l l l }
@@ -192,15 +186,39 @@ All MPI routines return an integer error code!
 	\lstinline$MPI_Allreduce(...)$ & \\
 \end{tabular}
 
-\subsubsection{Syncrhonisation}
+\subsubsection{Synchronisation}
 \begin{tabular}{ p{8cm} l }
 	\lstinline$MPI_Barrier(§cm§)$ & Waits for all processes. \\
 \end{tabular}
 
-\subsubsection{Virtual topologies}
-
+\subsubsection{Communicator handling}
 \begin{tabular}{ p{8cm} l }
+	\lstinline$MPI_Comm_dup(...)$ & \\
+	\lstinline$MPI_Comm_split(...)$ & \\
+	\lstinline$MPI_Comm_compare(...)$ & \\
+	\lstinline$MPI_Comm_free(...)$ & \\
+	\lstinline$MPI_Comm_rank(§cm§, ?rank?)$ & Get rank/id of current process in this communicator. \\
+	\lstinline$MPI_Comm_size(§cm§, ?size?)$ & Get total number of processes in this communicator. \\
 \end{tabular}
+
+\subsubsection{Virtual topologies}
+\begin{tabular}{ p{8cm} l }
+	\lstinline$MPI_Cart_create(...)$ & \\
+	\lstinline$MPI_Cart_rank(...)$ & \\
+	\lstinline$MPI_Cart_shift(...)$ & \\
+	\lstinline$MPI_Cart_sub(...)$ & \\
+	\lstinline$MPI_Cart_coords(...)$ & \\
+	\lstinline$MPI_Dims_create(...)$ & \\
+\end{tabular}
+
+\subsubsection{Derived Datatypes}
+\begin{tabular}{ p{8cm} l }
+	\lstinline$MPI_Type_contiguous(...)$ & \\
+	\lstinline$MPI_Type_vector(...)$ & \\
+	\lstinline$MPI_Type_commit(...)$ & \\
+	\lstinline$MPI_Type_free(...)$ & \\
+\end{tabular}
+
 
 \subsubsection{Timekeping}
 
