@@ -1,0 +1,773 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath} % Required for some math elements 
+\usepackage{fancyhdr}
+\usepackage[margin=2.50cm]
+{geometry}
+\usepackage[compact]
+{titlesec}
+\usepackage{hyperref}
+\usepackage[T1]
+{fontenc}
+\usepackage{color}
+\usepackage{array}
+\usepackage{paralist}
+\usepackage{listings}
+\usepackage{enumitem}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=cyan}
+
+% Title infos
+\title{HPC Formulars}
+\author{Steffen Vogel}
+\date{\today}
+
+% headline
+\lhead{HPC Formulars}
+\chead{Steffen Vogel}
+\rhead{\today}
+
+\pagestyle{fancy}
+\setlength{\parindent}{0cm}
+
+\begin{document}
+
+\section{Amdahl \& Gustafson}
+
+\begin{tabular}{ l | c c c }
+
+	& \textbf{General} & \textbf{Amdahl's Law} & \textbf{Gustafson's Law} \\
+	&	  & \textit{weak scaling}	& \textit{strong scaling} \\
+	\hline
+	Speedup \( S_p(N) \)  & \( \frac{T(1)}{T(N)} \) & \( \frac{1}{S + \frac{1 - S}{N}} \) & \( Np + s \) \\
+	Efficency \( \varepsilon_p(N) \) & \( \frac{S_p(N)}{N} = \frac{T(1)}{N \cdot T(N)} \) & \( \frac{1}{s(N-1) + 1} \) & \( \frac{1 - p}{N} \) \\
+\end{tabular}
+
+\section{Moore's Law}
+
+\begin{quote}
+	\# of transistors / cost-effective IC doubles every $N$ months, with $12 \leq N \leq 24$
+\end{quote}
+
+\section{Energy Efficency}
+
+\begin{tabular}{ p{7cm} l }
+	Power-voltage-frequency & \( P \sim V^2 \cdot f \) or \( P \sim f^3 \) \\
+	& \\
+	energy efficency & = \( \frac{\text{energy}}{\text{Flop}} \) \\
+			 & = \( \frac{\text{power consumption} \cdot \text{time}}{\text{Flop}} \) \\
+			 & = \( \frac{\text{power consumption}}{\text{Flop}/s} \) \\
+	energy		 & = \( \text{power consumption} \cdot \text{time} \) \\
+	& \\
+	Physical limit for efficency 	& 2.87e-21 Joule/Bit \( \approx ln(2) \cdot k \cdot T \) \\
+					& 1.84e-19 Joule/Flop \\
+	Green TOP500 \#1		& 2.22e-10 Joule/Flop \\
+	& \\
+	Power wall			& expected to be around 20 to 25 MWatt \\
+\end{tabular}
+
+\section{Pipelining}
+
+\begin{tabular}{ p{7cm} l }
+	Stages & $m$ \\
+	Operations & $N$ \\
+	Without pipeline & \( T_{seq} = m \cdot N \) \\
+	With pipeline & \( T_{pipe} = N + m − 1 \) \\
+	Speedup & \(S_{pipe} = \frac{m}{1 + \frac{m-1}{N}} \xrightarrow{N \rightarrow \infty} m \) \\
+	Throughput (results/cycle) & \( \frac{N}{T_{pipe}} = \frac{1}{1 + \frac{m-1}{N}} \xrightarrow{N \rightarrow \infty} 1 \) \\
+\end{tabular}
+
+\section{Memory Access}
+
+\begin{tabular}{ p{7cm} l }
+	Hit rate & $\beta$ \\
+	Miss rate & $(1 - \beta)$ \\
+	Access time& $T_m$ (Memory), $T_c$ (Cache) \\
+	Average access time & \( T_{avg} = \beta T_c + (1 - \beta) T_m \) \\
+	Performance gain & \( G( \theta, \beta ) = \frac{T_m}{T_{avg}} = \frac{\theta}{\beta + \theta(1 - \beta)},  \theta = \frac{T_m}{T_c} \) \\
+\end{tabular}
+
+\section{Networks}
+
+\subsection{Transmission \& Bandwidth}
+
+\begin{tabular}{ p{7cm} l }
+	Transmission time & \( T = T_L + \frac{N}{B} \) \\
+	Effective bandwidth & \( B_{eff} = \frac{N}{T} = \frac{N}{T_L + \frac{N}{B}} \) \\
+\end{tabular}
+
+\subsection{Topologies}
+
+\begin{tabular}{l | c c c c }
+	\textbf{Topology} & \textbf{Max degree} & \textbf{Edge connectivity} & \textbf{Diameter} & \textbf{Bisection BW} \\
+	\hline
+	Bus		& 1  & 1   & 1 & B \\
+	Ring		& 2  & 2   & \( \lfloor \frac{N}{2} \rfloor \) & 2B \\
+	Fully connected	& \( \frac{N(N-1)}{2} \) & N-1 & 1 & \( \frac{N^2}{4} \) \\ 
+	Sw. Fat Tree	& 1 w/o redunancy & depends on design & 2 hierarchy height & depends on design \\
+	Mesh		& 2d & d   & \( \sum_{i=1}^d (N_i - 1) \) & \( B ( \prod_{i=1}^{d-1} N_i ) \) \\
+	Torus		& 2d & 2d  & \( \sum_{i=1}^d \lfloor \frac{N}{2} \rfloor  \) & \( 2B ( \prod_{i=1}^{d-1} N_i ) \) \\
+
+	Hypercube	& d  & d   & d & \( B2^{d-1} \) \\ 
+\end{tabular}
+
+\section{Balance, Lightspeed}
+
+\begin{tabular}{ p{7cm} l }
+	Code balance &  \( B_c = \frac{\text{data transfers}}{\text{arithmetic ops}} = \frac{[Words]}{[Flops]} \) \\
+	Machine balance & \( B_m = \frac{b_s}{P_{max}} \) \\
+	Relative lightspeed & \( l = \min(1, \frac{B_m}{B_c} ) \) \\
+	Absolute lightspeed performance & \( P = P_{max} \cdot l \) \\
+\end{tabular}
+
+\section{Programming API's}
+
+\subsection{MPI}
+
+\subsubsection{Point-to-point data transfer}
+\begin{tabular}{ p{7cm} l }
+	\lstinline$MPI_Recv(...)$ & \\
+	\lstinline$MPI_Irecv(...)$ & \\
+	\lstinline$MPI_Send(...)$ & \\
+	\lstinline$MPI_Bsend(...)$ & \\
+	\lstinline$MPI_Ssend(...)$ & \\
+	\lstinline$MPI_Sendrecv(...)$ & \\
+	\lstinline$MPI_Sendrecv_replace(...)$ & \\
+\end{tabular}
+
+\subsubsection{Collective data transfer}
+
+\begin{tabular}{ p{7cm} l }
+	\lstinline$MPI_Bcast(...)$ & \\
+	\lstinline$MPI_Allgather(...)$ & \\
+	\lstinline$MPI_Allreduce(...)$ & \\
+	\lstinline$MPI_Scatter(...)$ & \\
+	\lstinline$MPI_Gather(...)$ & \\
+\end{tabular}
+
+\subsubsection{Initialization, communicator handling}
+
+\begin{tabular}{ p{7cm} l }
+	\lstinline$MPI_Init(...)$ & \\
+	\lstinline$MPI_Finalize(...)$ & \\
+	\lstinline$MPI_Comm_rank(...)$ & \\
+	\lstinline$MPI_Comm_size(...)$ & \\
+\end{tabular}
+
+\subsubsection{Virtual topologies}
+
+\begin{tabular}{ p{7cm} l }
+\end{tabular}
+
+\subsubsection{Timekeping}
+
+\begin{tabular}{ p{7cm} l }
+	\lstinline$MPI_Wtime(...)$ & \\
+	\lstinline$MPI_Wtick(...)$ & \\
+\end{tabular}
+
+\subsection{CUDA}
+
+TODO
+
+\subsection{OpenMP}
+
+\begin{tabular}{ p{7cm} l }
+	\lstinline$#pragma omp parallel$ & \\
+	\lstinline$#pragma omp for [simd]$ & \\
+	\lstinline$#pragma omp sections$ & \\
+	\lstinline$#pragma omp section$ & \\
+	\lstinline$#pragma omp task$ & \\
+	\lstinline$#pragma omp target [data]$ & \\
+	\lstinline$#pragma omp distribute$ & \\
+	\lstinline$#pragma omp teams$ & \\ 
+	\lstinline$#pragma omp target$ & \\
+	\lstinline$#pragma omp target$ & \\
+\end{tabular}
+
+\subsubsection{Environment variables}
+
+\begin{tabular}{ p{7cm} l }
+	\lstinline$OMP_NUM_THREADS$ & \\
+	\lstinline$OMP_PLACES$ & \\
+	\lstinline$KMP_AFFINITY$ & \\
+\end{tabular}
+
+\subsubsection{Runtime API}
+
+\begin{tabular}{ p{7cm} l }
+	\lstinline$omp_set_num_threads(n)$ & \\
+\end{tabular}
+
+\subsection{OpenACC}
+
+\begin{tabular}{ p{7cm} l }
+	\lstinline$#pragma acc parallel [loop]$ & \\
+	\lstinline$#pragma acc wait$ & \\
+	\lstinline$#pragma acc parallel$ & \\
+	\lstinline$#pragma acc parallel$ & \\
+	\lstinline$#pragma acc parallel$ & \\
+\end{tabular}
+
+\section{LSF}
+
+TODO
+
+\section{Common problems and operations}
+
+\begin{tabular}{ p{7cm} l }
+	Single-precision real Alpha X Plus Y & \( \vec{y} = \alpha \cdot \vec{x} + \vec{y} \) \\
+	(S/DAXPY, FMA, Triad) & \\
+	Sparse matrix vector multiply & \( \vec{y} = \mathbf{A} \cdot \vec{x} \) \\
+	Dense matrix vector multiply & \\
+	Dense matrix multiplication & \( \mathbf{A} = \mathbf{B} \cdot \mathbf{C} \) \\
+	Dense matrix diagonalization & \( \mathbf{P}^{-1} \mathbf{A} \mathbf{P} = diag(\lambda_1, ..., \lambda_n) \) \\
+	Scalar product & \( s = \vec{x} \cdot \vec{y} \) \\
+	Vector addition & \( \vec{y} = \vec{x} + \vec{z} \) \\
+	Matrix addition & \( \mathbf{A} = \mathbf{B} + \mathbf{C} \) \\
+	Matrix transpose & \( \mathbf{A} = \mathbf{B}' \) \\
+\end{tabular}
+
+\newpage
+\section{What you've learned?}
+
+\subsection{Why supercomputers?}
+
+\begin{description}[style=nextline]
+	\item[What is a supercomputer?] A supercomputer is a computer at the frontline of current processing capacity, particularly speed of calculation.
+	\item[What are supercomputers used for?]
+	\begin{itemize}
+		\item Scientific computing \& simulation
+		\item Weapon research
+		\item Economics (Oil, minerals)
+		\item Medicine
+		\item Meteorology
+	\end{itemize}
+	\item[What are recent supercomputers]	See TOP500 list of world's fastest systems:
+		\begin{enumerate}
+			\item Tianhe-2 (33 PFlops/s)
+			\item Titan (17 PFlops/s)
+		\end{enumerate}
+	\item[What can we read from the performance development as measured in the TOP500?] The TOP500 lists by peak performance $R_max$ in Flops/s (double) measured by a standardized benchmark (LIN/LAPACK). \\
+	Future trends are predictable (exascale computing, architectures).
+	
+	\item[What does Moore's Law tell you? Is it still valid?] "The number of transistors per chhip doubles around every one to two years." \\
+	Slope is now declining slowy. But mostly still valid.
+	
+	\item[Why do we have multi-core architectures today?] Clock frequencies can't pushed further due to limited cooling capabilities. \\
+	Solution: Decrease frequency; increase die-size by putting more cores on a single chip and exploit parallelism.
+	
+\end{description}
+
+\newpage
+\subsection{Energy Efficency}
+
+\begin{description}[style=nextline]
+	\item[What is the power wall?] 20 to 25 MegaWatt of energy consumption is considered an important barrier for HPC centres.
+
+	\item[What is the problem?] To meet the exa-scale goal in 2019, the current trend of energy efficiency isn't sufficient. \\
+	Power consumption will become the dominating cost factor for operate clusters in the future.
+
+	\begin{description}[style=nextline]
+		\item[Aspects of energy efficency] Energy efficiency is continously improving. To meed the exa-scale goal this has to focused more by using new architectures (accelerators).
+
+		\item[Physical descriptions \& limits] Landauer's principle: "Changing one bit of intermation needs at least an amount of energy of $ln(2) \cdot k \cdot T$". \\
+		The current top Green500 systems are about 10 magnitues away from this limitation.
+
+	\end{description}
+	\item[How can we benchmark energy efficency?] Measure only the consumption of a single rack and extrapolate. Average over diffrent benchmarks. 
+
+	\begin{description}[style=nextline]
+		\item[Advantages \& disadvantages of Green500, SPEC Power] High variations in idle and during benchmarks and between nodes. Power extrapolation may not be allowed.
+
+	\end{description}
+	\item[What are the architectural aspects of energy efficency?] Current von Neumann architectures were'nt designed with energy efficiency in mind: OoO execution, cache coherency and prefetchers are inefficient. \\
+	Desktop/mobile power saving methods are applied to HPC (C and P-states).
+	
+	\begin{description}[style=nextline]
+		\item[What is dynamic frequency and voltage scaling?] Reduce voltage/frequency during idle times to save energy. Implemented by processor P-states.
+
+	\end{description}
+	\item[What are the future plans to climb the power wall?]
+	\begin{itemize}
+		\item Optimize current architectures
+		\item Power-efficient accelerators
+		\item Reduce idle power to $\approx 0 W$
+		\item Load-balancing by DVS/DFS.
+	\end{itemize}
+	\begin{description}[style=nextline]
+		\item[What about GPU's?] GPU's are a lot more efficient because more transistors are used for computation instead of controlling/management tasks. They already use faster DDR5-RAM. But PCIe will become a bottleneck when CPUs get stacked RAM.
+
+		\item[What about stacked memory?] Is a must-have to reach the exa-scale goal. Shorter paths allow higher bandwidths and lower voltages (maintainability? extend the caching hierarchy by SSDs?).
+
+	\end{description}
+\end{description}
+
+\newpage
+\subsection{Modern Processors}
+
+\begin{description}[style=nextline]
+	\item[What is an ISA?] The for Instruction Set Architecture is the part of an architecture which is visible to the application programmer / compiler.
+
+	\begin{description}[style=nextline]
+		\item[What are the differences in ISA's?]
+		\begin{itemize}
+			\item Instructions, CISC or RISC
+			\item Memory addressing modes
+			\item Internal storage, registers
+			\item Endianess
+		\end{itemize}
+
+		\item[What are the main differences between RISC and CISC?]
+			\begin{description}
+				\item[CISC] Instructions may involve complex operations and are variable in length.
+				\item[RISC] Similiar encoding for all instructions, fixed length. Strict distinction between data loading/storing and manipulation.
+			\end{description}
+
+		\item[What do we have today?] HPC dominant x86 architectures are CISC based.
+	\end{description}
+	
+	\item[What is the basis of today's processors?] They mostly decode CISC instructions to microcode ops (hybrid CISC/RISC).
+ 
+	\begin{description}[style=nextline]
+		\item[What are the corresponding bottlenecks?] \hfill
+ 
+		\item[How can we overcome these?] \hfill
+ 
+	\end{description}
+	\item[What is ILP?] Instruction level parallelism is the potential overlap of instruction execution caused by superscalarity, OoO and pipelines.
+ 
+	\begin{description}[style=nextline]
+		\item[What is its influence on today's computers? over time?] Todays CPU's use hardware implmented schedulers, dependency resolvers for microcode operations => very complex controlling.
+ 
+	\end{description}
+	\item[Pipelining]
+	\begin{description}[style=nextline]
+		\item[How does it work?] Pipelining splits the execution of an instruction in multiple preferably equally long 'stages' which are orthogonal to each other. \\
+		This allows reusing the execution unit of one stage for the next instruction before the first instruction has retired.
+ 
+		\item[How to compute possible speedup/throughput?] See formulars.
+ 
+		\item[Problems?]
+		\begin{itemize}
+			\item Pipeline stalls caused by phases of diffrent lengths
+			\item Hazards caused by dependent data, instructions, branch-misses...
+			\item Inbalanced CISC instruction decoding/fetching
+			\item Aliasing...
+		\end{itemize}
+ 
+	\end{description}
+	\item[Superscalarity] "Execute multiple instructions per cycle."
+
+	\begin{description}[style=nextline]
+		\item[What is a superscalar processor?] A superscalar processor consist of multiple FP pipelines, instruction fetchers and decoders.
+		Thereby can execute multiple instructions per cycle and allows a higher pipline utilization and SMT. \\
+		This is a kind of ILP.
+
+	\end{description}
+	\item[SIMD] Single-Instruction-Multiple-Data
+	\begin{description}[style=nextline]
+		\item[How does it work?] Execute a single instruction initiates multiple integer or floating point operations on wide "registers"/"vectors".
+
+		\item[What are the recent vector register widths?] SSE has 128 Bits, AVX has 256 Bits, the Xeon Phi even 512 Bits with AVX2.
+
+		\item[What to think about if code vectorization is desired?]
+		\begin{itemize}
+			\item Check for automatic loop-unrolling by compilers
+	 		\item Profiling is recommended to eliminate memory bottlenecks (alignment!)
+	 		\item Avoid high level C++ abstractions which could avoid optimization!
+		\end{itemize}
+		
+	\end{description}
+	\item[Why were caches introduced?] To close the increasing gap between memory bandwidth and processor performance by adding several layers of caches with increasing bandwidth.
+
+	\begin{description}[style=nextline]
+		\item[What is a cache?] It's a high speed memory with low capacity which is usually organized in multiple layers. Commonly the caches are integrated into the CPU dia for high bandwidth.
+
+		\item[What performance characteristics does it have?] High speed: allows multiple transfers per cycle
+
+		\item[When does it makes sense to use a cache?] If compution performance is limited by memory bandwidth
+
+		\item[What are cache hits/misses?] Cache hits occur when requested items are currently hold in the cache. Otherwise a cache miss happens.
+
+		\item[What is the principle of locality?] A item that was referenced will soon be referenced again (temporal). Items that are close to a recentl referenced item are likely to be referenced in near future (spatial).
+
+	\end{description}
+	\item[Which cache types do exist \& what are their differences?]
+	\begin{itemize}
+		\item Data cache => stores data only
+		\item Instruction cache => stores instructions only
+		\item Unified cache => stores both
+		\item Trace/Mircro-OP cache => stores decoded instructions
+	\end{itemize}
+
+	\item[Why is cache coherence important?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How is the coherence achieved?] \hfill
+
+	\end{description}
+	\item[When is prefetching used?] Prefetching is used to continously fetch data from the main memory. Cache misses usually trigger prefetches of the neighboring cache line.
+
+\end{description}
+
+\newpage
+\subsection{Basic optimization techniques for serial code}
+
+\begin{description}[style=nextline]
+	\item[What is a hot spot?] \hfill
+
+	\item[What kind of trigger mechanisms do exist?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[What is the difference between event-driven and sample-driven triggers?] \hfill
+
+		\item[What is instrumentation?] \hfill
+ 
+	\end{description}
+	\item[What kind of recording mechanisms do exist?] \hfill
+ 
+	\begin{description}[style=nextline]
+		\item[What is the difference between profiling and tracing?] \hfill
+
+	\end{description}
+	\item[What can hardware performance counter measure?] \hfill
+ 
+
+	\item[What are basic single-core optimizations?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[What are simple loop optimizations?] \hfill
+
+		\item[How to avoid expensive operations?] \hfill
+ 
+		\item[What to consider with data types?] \hfill
+ 
+		\item[How can temporary variables increase performance?] \hfill
+ 
+		\item[Can vectorization help for memory-bound programs?] \hfill
+ 
+		\item[What is the role of the compiler?] \hfill
+ 
+		\item[What are problems with C++ codes?] \hfill
+ 
+	\end{description}
+\end{description}
+
+\newpage
+\subsection{Data access optimization}
+
+\begin{description}[style=nextline]
+	\item[What can be modelled with the balance metric?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How are lightspeed, machine and code balance defined?] \hfill
+
+		\item[How can we get values for lightspeed, machine and code balance?] \hfill
+ 
+		\item[What are the limitations of this model?] \hfill
+ 
+	\end{description}
+	\item[How can algorithms be classified depending on the number of arithmetic operations and data transfers?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Which algorithm types have potential for optimizations?] \hfill
+
+		\item[Which optimizations should be applied?] \hfill
+ 
+	\end{description} 
+	\item[Sparse matrix-vector multiply] \hfill
+ 
+	\begin{description}[style=nextline]
+		\item[How can sparse matrices be stored and why?] \hfill
+
+		\item[How is the sparse matrix-vector multiply computed and optimized?] \hfill
+ 
+	\end{description}
+\end{description}
+
+\newpage
+\subsection{Parallel computers}
+
+\begin{description}[style=nextline]
+	\item[Which taxonomy for parallel computing does exist?] \hfill
+
+	\item[What can limit scalability?] \hfill
+
+	\item[What does Amdahl’s Law (strong scaling) say?] \hfill
+
+	\item[What does Gustafson’s Law (weak scaling) say?] \hfill
+
+	\item[What is a of multicore processors?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Why do we have multicore processors?] \hfill
+
+	\end{description}
+	\item[Which advantages do SMT have?] \hfill
+ 
+	\item[What is a shared-memory computer?] \hfill
+ 
+	\begin{description}[style=nextline]
+		\item[What is the difference between UMA and ccNUMA?] \hfill
+
+	\end{description}
+	\item[What is a distributed-memory computer?] \hfill
+ 
+	\begin{description}[style=nextline]
+		\item[How do hybrid systems look like?] \hfill
+
+	\end{description}
+\end{description}
+
+\subsubsection{Networks}
+
+\begin{description}[style=nextline]
+	\item[Which network performance metrics do exist?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[What can the PingPong benchmark model (latency, effective bandwidth)?] \hfill
+
+		\item[What does the LogP model do?] \hfill
+ 
+		\item[What are the definitions for bisection bandwidth, diameter \& edge connectivity?] \hfill
+ 
+	\end{description}
+	\item[What are relevant network topologies in HPC?] \hfill
+ 
+	\begin{description}[style=nextline]
+		\item[What are the bisection bandwidth, diameter, node \& edge connectivity of
+networks such as Ring, Bus, Switched/Fat Tree, Meshes, Hypercubes, Tori,
+Hybrids?] \hfill
+		
+	\end{description}
+\end{description}
+
+\newpage
+\subsection{Parallelization and optimization strategies}
+
+\begin{description}[style=nextline]
+	\item[Which types of parallelism do exist?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[What overhead do the different types have \& how can it be reduced?] \hfill
+
+		\item[What is a task dependency graph \& its critical path and average concurrency?] \hfill
+
+	\end{description}
+	\item[Which parallel design spaces \& patterns are defined by Mattson?] \hfill
+ 
+	\begin{description}[style=nextline]
+		\item[What is adaptive geometric decomposition \& adaptive mesh refinement?] \hfill
+
+		\item[What does load imbalance mean? Which types do exist? How to get a load balanced application?] \hfill
+ 
+		\item[What are differences between SPMD, Master/ Worker, Loop Parallelism and Fork/ Join? Name a typical example.] \hfill
+
+		\item[What does NUMA affinity mean? How can memory placement and binding
+affect performance?] \hfill
+ 
+	\end{description}
+	\item[Which are typical approaches in a Molecular Dynamics application?] \hfill
+ 
+\end{description}
+
+\newpage
+\subsection{Distributed-memory programming with MPI}
+
+\begin{description}[style=nextline]
+	\item[Basic ideas of MPI] \hfill
+
+	\begin{description}[style=nextline]
+		\item[What is SPMD and how is it implemented by MPI?] \hfill
+
+		\item[How MPI abstracts the communication?] \hfill
+ 	
+	\end{description}
+	\item[Point-to-point operations] \hfill
+ 
+	\begin{description}[style=nextline]
+		\item[How to transfer data between processes in the form of messages?] \hfill
+
+		\item[How to prevent deadlocks and overlap communication and computation?] \hfill
+
+	\end{description}
+	\item[Collective operations] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How to scatter and gather data and perform operations on distributed data?] \hfill
+
+	\end{description}
+	\item[Virtual topologies] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How to distribute processes over a regular grid?] \hfill
+
+	\end{description}
+	\item[Derived datatypes] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How to combine MPI datatypes into more complex entities?] \hfill
+
+	\end{description} 
+\end{description}
+
+\newpage
+\subsection{Shared-memory programming with OpenMP}
+
+\begin{description}[style=nextline]
+	\item[Basic principle of OpenMP] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Execution model] \hfill
+
+		\item[Parallel region + worksharing constructs] \hfill
+ 
+	\end{description}
+	\item[Scoping] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Data sharing clauses] \hfill
+
+	\end{description}
+	\item[Synchronization] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Critical section] \hfill
+
+		\item[Reduction clause] \hfill
+ 
+		\item[Team and Task-Barriers] \hfill
+ 
+	\end{description} 
+	\item[Runtime library] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Important functions] \hfill
+
+	\end{description}
+\end{description}
+
+\newpage
+\subsection{Hybrid programming (MPI + OpenMP)}
+
+\begin{description}[style=nextline]
+	\item[Hybrid programming basics] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Why we need hybrid programs] \hfill
+
+		\item[Hybrid programming models] \hfill
+ 	
+	\end{description}
+	\item[Threading modes of MPI] \hfill
+ 
+	\begin{description}[style=nextline]
+		\item[What levels of thread support MPI provides] \hfill
+
+		\item[Potential troubles with multithreaded MPI programs] \hfill
+ 
+	\end{description}
+	\item[Addressing multiple threads within MPI processes] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How to work around the flat addressing space of MPI] \hfill
+
+		\item[Using multiple communicators in a hybrid context] \hfill
+ 
+	\end{description}
+	\item[Running hybrid programs on the RWTH cluster] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How to properly instruct LSF to run your hybrid job] \hfill
+ 	
+	\end{description}
+\end{description}	
+
+\newpage
+\subsection{Heterogeneous architectures (GPUs, Xeon Phis)}
+
+\subsubsection{GPGPU's}
+
+\begin{description}[style=nextline]
+	\item[How does a GPU look like?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Why do GPUs deliver a good performance per Watt ratio?] \hfill
+
+		\item[What is the difference to CPUs?] \hfill
+ 
+		\item[How does the memory hierarchy look like?] \hfill
+ 
+		\item[How can the logical programming hierarchy be mapped to the execution model?] \hfill
+ 
+	\end{description}
+	\item[Which models can be used to program a GPU?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How to handle offloading of regions?] \hfill
+
+		\item[How to handle data management?] \hfill
+ 	
+		\item[What are the main differences?] \hfill
+ 
+	\end{description}
+	\item[Which impact does the PCIe have?] \hfill
+
+	\item[What is branch divergence?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Which performance impact does it have?] \hfill
+
+	\end{description}
+	\item[What can be a good launch configuration and why?] \hfill
+ 
+	\begin{description}[style=nextline]
+		\item[How can the launch configuration be specified?] \hfill
+
+	\end{description}
+	\item[What can be done to saturate the bus?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[What is coalescing?] \hfill
+
+		\item[How can it be achieved?] \hfill
+ 
+		\item[What impact does AoS and SoA have?] \hfill
+ 	
+		\item[What is the difference between caching and non-caching loads?] \hfill
+ 
+	\end{description}
+	\item[What is shared memory?] \hfill
+
+	\item[How to avoid CPU/ GPU idling?] \hfill
+
+\end{description}
+
+\subsubsection{Xeon Phi}
+
+\begin{description}[style=nextline]
+	\item[How does a Xeon Phi look like?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How does the memory hierarchy look like?] \hfill
+
+		\item[How many threads/ vector-widths are available?] \hfill
+ 
+	\end{description}
+	\item[Which programming concepts do exist?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[How can OpenMP (4.0) be used?] \hfill
+
+	\end{description}
+	\item[Which optimization strategies should be applied?] \hfill
+
+	\begin{description}[style=nextline]
+		\item[Which impact can the PCIe have?] \hfill
+
+		\item[Which impact does vectorization have?] \hfill
+
+	\end{description}
+\end{description}
+
+\end{document}
