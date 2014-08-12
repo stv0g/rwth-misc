@@ -1,20 +1,24 @@
 \documentclass[11pt]{article}
 
-\usepackage{amsmath} % Required for some math elements 
+\usepackage{amsmath,amssymb,latexsym}
 \usepackage{fancyhdr}
-\usepackage[margin=2.50cm]
-{geometry}
-\usepackage[compact]
-{titlesec}
+\usepackage[margin=2.50cm]{geometry}
+\usepackage[compact]{titlesec}
 \usepackage{hyperref}
-\usepackage[T1]
-{fontenc}
+\usepackage[T1] {fontenc}
 \usepackage{color}
+\usepackage{multirow}
 \usepackage{array}
 \usepackage{paralist}
 \usepackage{listings}
 \usepackage{enumitem}
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=cyan}
+
+\lstset{
+	moredelim=[is][\color{green}]{§}{§},
+	moredelim=[is][\color{red}]{?}{?},
+	moredelim=[is][\color{cyan}]{|}{|}
+}
 
 % Title infos
 \title{HPC Formulars}
@@ -121,48 +125,88 @@
 
 \section{Programming API's}
 
+Argument directions: \lstinline$§input§$, \lstinline$?output?$, \lstinline$|inout|$
+Common arguments:
+	communicator = cm
+
 \subsection{MPI}
 
+All MPI routines return an integer error code!
+
+\subsubsection{Initialization}
+\begin{tabular}{ p{8cm} l }
+	\lstinline$MPI_Init(§argc§, §argv§)$ & Has to be called before every other MPI\_* function. \\
+	\lstinline$MPI_Finalize()$ & Like \lstinline$MPI_Init()$ this must only be called once. \\
+	\lstinline$MPI_Initialized(?flag?)$ & Check if MPI runtime was already initialized. \\
+	\lstinline$MPI_Finalized(?flag?)$ & Check if MPI runtime was already shut down. \\
+\end{tabular}
+
+\subsubsection{Communicator handling}
+\begin{tabular}{ p{8cm} l }
+	\lstinline$MPI_Comm_rank(§cm§, ?rank?)$ & Get rank/id of current process in this communicator. \\
+	\lstinline$MPI_Comm_size(§cm§, ?size?)$ & Get total number of processes in this communicator. \\
+\end{tabular}
+
 \subsubsection{Point-to-point data transfer}
-\begin{tabular}{ p{7cm} l }
-	\lstinline$MPI_Recv(...)$ & \\
-	\lstinline$MPI_Irecv(...)$ & \\
-	\lstinline$MPI_Send(...)$ & \\
-	\lstinline$MPI_Bsend(...)$ & \\
-	\lstinline$MPI_Ssend(...)$ & \\
-	\lstinline$MPI_Sendrecv(...)$ & \\
-	\lstinline$MPI_Sendrecv_replace(...)$ & \\
+
+\begin{tabular}{ l | l l l }
+	\textbf{Mode / Op} & \textbf{Blocking} & \textbf{Non-blocking} & \textbf{Completes after...} \\
+	\hline
+	Standard	& \lstinline$MPI_Send$($\otimes$) & \lstinline$MPI_Isend$($\otimes, \ddag$) & the message has been safely stored away. \\
+	Synchronous	& \lstinline$MPI_Ssend$($\otimes$) & \lstinline$MPI_Issend$($\otimes, \ddag$) & the receive was called. \\
+	Buffered	& \lstinline$MPI_Bsend$($\otimes$) & \lstinline$MPI_Ibsend$($\otimes, \ddag$) & the message was stored away in a buffer. \\	
+	Ready-mode	& \lstinline$MPI_Rsend$($\otimes$) & \lstinline$MPI_Irsend$($\otimes, \ddag$) & only if the receive was called before send. \\
+	\hline
+	Standard	& \lstinline$MPI_Recv$($\diamond, \dag$) & \lstinline$MPI_Irecv$($\diamond, \ddag$) & a message was received. \\
+	Probing		& \lstinline$MPI_Probe$() & \lstinline$MPI_Iprobe$  & immediately. \\
+	Waiting		& \lstinline$MPI_Wait$($\ddag, \dag$) & \lstinline$MPI_Test$($\ddag, $\lstinline$?flag?$$, \dag$) & message available. \\
+\end{tabular}
+
+
+\textbf{Signatures}: \\
+{ \footnotesize
+	\hspace{2cm} $\otimes$ \lstinline$(§buffer§, §count§, §type§, §dst§, §tag§, §cm§)$, \\
+	\hspace{2cm} $\diamond$ \lstinline$(?buffer?, §count§, §type§, §dst§, §tag§, §cm§)$, \\
+	\hspace{2cm} $\dag$ \lstinline$(?status?)$ $\ddag$ \lstinline$(?request?)$
+}
+
+\begin{tabular}{ p{8cm} l }
+	\lstinline$MPI_Get_count(§stat§, §type§, ?count?)$ & Get the number of received elements by \lstinline$MPI_Recv()$. \\
+
+	\lstinline$MPI_Sendrecv(§sbuf§, §scnt§, §stype§, §dst§, §stag§,$ & Simultaneous, deadlock-free send and receive. \\
+	\lstinline$    ?rbuf?, ?scnt?, ?stype?, ?dst?, ?stag?, §cm§, ?stat?)$ & \\
+
+	\lstinline$MPI_Sendrecv_replace(...)$ & Like \lstinline$MPI_Sendrecv()$ but using the same buffer. \\
 \end{tabular}
 
 \subsubsection{Collective data transfer}
 
-\begin{tabular}{ p{7cm} l }
-	\lstinline$MPI_Bcast(...)$ & \\
+\begin{tabular}{ p{8cm} l }
+	\lstinline$MPI_Bcast(|buf|, §cnt§, §type§, §root§, §cm§)$ & Broadcasts data from root to all other. \\	\lstinline$MPI_Scatter(§sbuf§, §scnt§, §stype§,$ & Scatters chunks of data from root to all \\
+	\lstinline$     ?rbuf?, §rcnt§, §rtype§, §root§, §cm§)$ & \\
+	\lstinline$MPI_Gather(§sbuf§, §scnt§, §stype§,$ & Gathers chunks of data from root to all \\
+	\lstinline$     ?rbuf?, §rcnt§, §rtype§, §root§, §cm§)$ & \\
 	\lstinline$MPI_Allgather(...)$ & \\
+	\lstinline$MPI_Alltoall()$ & \\
+	\lstinline$MPI_Redude()$ & \\
 	\lstinline$MPI_Allreduce(...)$ & \\
-	\lstinline$MPI_Scatter(...)$ & \\
-	\lstinline$MPI_Gather(...)$ & \\
 \end{tabular}
 
-\subsubsection{Initialization, communicator handling}
-
-\begin{tabular}{ p{7cm} l }
-	\lstinline$MPI_Init(...)$ & \\
-	\lstinline$MPI_Finalize(...)$ & \\
-	\lstinline$MPI_Comm_rank(...)$ & \\
-	\lstinline$MPI_Comm_size(...)$ & \\
+\subsubsection{Syncrhonisation}
+\begin{tabular}{ p{8cm} l }
+	\lstinline$MPI_Barrier(§cm§)$ & Waits for all processes. \\
 \end{tabular}
 
 \subsubsection{Virtual topologies}
 
-\begin{tabular}{ p{7cm} l }
+\begin{tabular}{ p{8cm} l }
 \end{tabular}
 
 \subsubsection{Timekeping}
 
-\begin{tabular}{ p{7cm} l }
-	\lstinline$MPI_Wtime(...)$ & \\
-	\lstinline$MPI_Wtick(...)$ & \\
+\begin{tabular}{ p{8cm} l }
+	\lstinline$double MPI_Wtime()$ & Measure local wall-clock time. \\
+	\lstinline$double MPI_Wtick()$ & Obtain the precision of the MPI timer. \\
 \end{tabular}
 
 \subsection{CUDA}
