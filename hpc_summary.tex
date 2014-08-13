@@ -295,7 +295,7 @@ All MPI routines return an integer error code!
 
 \section{LSF}
 
-TODO
+See \texttt{man bsub}.
 
 \section{Common problems and operations}
 
@@ -529,7 +529,6 @@ TODO
 		\item Use SIMD instruction sets
 		\item Support the compiler use flags wisely
 		\item C++
-		
 	\end{itemize}
 
 	\begin{description}[style=nextline]
@@ -653,68 +652,83 @@ TODO
 \subsection{Parallelization and optimization strategies}
 
 \begin{description}[style=nextline]
-	\item[Which types of parallelism do exist?] \hfill
+	\item[Which types of parallelism do exist?]
+	\begin{itemize}
+		\item Instruction/Processor level parallelism: Superscalarity, SIMD, SMT?
+		\item Node/chip level: several cores run in parallel on the same memory
+		\item System level: serveral nodes run in parallel, communication over a network
+	\end{itemize} 
 
 	\begin{description}[style=nextline]
-		\item[What overhead do the different types have \& how can it be reduced?] \hfill
+		\item[What overhead do the different types have \& how can it be reduced?] Overhead increases from instruction to system level parallelism. Overhead includes Amdahl's Law implications as well as the additional time required for implementation!
+		Use compiler optimization and existing patterns to reduce implementation overhead.
 
-		\item[What is a task dependency graph \& its critical path and average concurrency?] \hfill
+		\item[What is a task dependency graph \& its critical path and average concurrency?] It's a DAG show dependencies on data and execution order of diffrent parts of the code.
+		\begin{description}
+			\item[Critial Path] Length of the longest path (sum of weights)
+			\item[Avg Concurrency] Ratio of total amount of work to critical path length.
+		\end{description}
 
 	\end{description}
-	\item[Which parallel design spaces \& patterns are defined by Mattson?] \hfill
+	\item[Which parallel design spaces \& patterns are defined by Mattson?]
+	\begin{itemize}
+		\item Finding Concurrency: Dependency Analysis \& Decomposition.
+		\item Algorithm Structure: Organize by.. tasks, data decomposition, flow of of data.
+		\item Supporting Structures: Program \& Data Structures
+		\item Implementation Mechanisms: UE Management, Sychronization, Communication.
+	\end{itemize}
  
 	\begin{description}[style=nextline]
-		\item[What is adaptive geometric decomposition \& adaptive mesh refinement?] \hfill
+		\item[What is geometric decomposition \& adaptive mesh refinement (AMR)?] Problem/data dependent adaption of grid resolution. Increasing accuracy in important regions. Split the problem space geometrically and distribute these parts to UEs.
 
-		\item[What does load imbalance mean? Which types do exist? How to get a load balanced application?] \hfill
+		\item[What does load imbalance mean? Which types do exist? How to get a load balanced application?] In a team of threads/UE, one takes longer because it's working set takes longer to solve than the others. These threads are called "speeders" \& "laggers". \\
+		There are geometric and graph-based load balancing methods which are statically or dynamic.
  
-		\item[What are differences between SPMD, Master/ Worker, Loop Parallelism and Fork/ Join? Name a typical example.] \hfill
+		\item[What are differences between SPMD, Master/Worker, Loop Parallelism and Fork/Join? Name a typical example.] All these are supporting structures to parallelize algorithms. SPMD and Loop Parallelism execute the same code on multiple UEs. Master/Worker, Fork/Join offer a greater flexibility in this regard.
 
-		\item[What does NUMA affinity mean? How can memory placement and binding
-affect performance?] \hfill
- 
+		\item[What does NUMA affinity mean? How can memory placement and binding affect performance?] For optimal performance, data has to be closely located to the cores which are using it. Modern OSes use "affinity on first touch" which allocates memory on the same socket where the task is executed.
 	\end{description}
-	\item[Which are typical approaches in a Molecular Dynamics application?] \hfill
- 
+	
+	\item[Which are typical approaches in a Molecular Dynamics application?]
+	\begin{itemize}
+		\item Particle Decomposition
+		\item Force Decomposition
+		\item Domain Decomposition
+	\end{itemize}
 \end{description}
 
 \newpage
 \subsection{Distributed-memory programming with MPI}
 
 \begin{description}[style=nextline]
-	\item[Basic ideas of MPI] \hfill
+	\item[Basic ideas of MPI] Don't rely on cache coherence. Use messages to communicate between workers/UEs.
 
 	\begin{description}[style=nextline]
-		\item[What is SPMD and how is it implemented by MPI?] \hfill
+		\item[What is SPMD and how is it implemented by MPI?] All workers execute the same program. Program flow is directed by the so called "rank" which is unique per process.
 
-		\item[How MPI abstracts the communication?] \hfill
+		\item[How MPI abstracts the communication?] MPI provides a runtime API with a large set of functions for point-to-point and collective operations. It also has abstraction mechanisms for the underlying network topology.
  	
 	\end{description}
-	\item[Point-to-point operations] \hfill
- 
+	\item[Point-to-point operations] 
 	\begin{description}[style=nextline]
-		\item[How to transfer data between processes in the form of messages?] \hfill
+		\item[How to transfer data between processes in the form of messages?] Use \lstinline$MPI_Send()$, \lstinline$MPI_Recv()$ functions (or their variants) for point-to-point communication. See API reference above.
 
-		\item[How to prevent deadlocks and overlap communication and computation?] \hfill
+		\item[How to prevent deadlocks and overlap communication and computation?] Use non-blocking variants or \lstinline$MPI_Sendrecv()$.
 
 	\end{description}
-	\item[Collective operations] \hfill
-
+	\item[Collective operations]
 	\begin{description}[style=nextline]
-		\item[How to scatter and gather data and perform operations on distributed data?] \hfill
+		\item[How to scatter and gather data and perform operations on distributed data?] Use the \lstinline$MPI_Scatter()$ and \lstinline$MPI_Gather()$ functions or their variable chunk variants.
 
 	\end{description}
-	\item[Virtual topologies] \hfill
-
+	\item[Virtual topologies] 
 	\begin{description}[style=nextline]
-		\item[How to distribute processes over a regular grid?] \hfill
+		\item[How to distribute processes over a regular grid?] Use the \lstinline$MPI_Cart_*()$ set of functions.
 
 	\end{description}
-	\item[Derived datatypes] \hfill
-
+	\item[Derived datatypes]
 	\begin{description}[style=nextline]
-		\item[How to combine MPI datatypes into more complex entities?] \hfill
-
+		\item[How to combine MPI datatypes into more complex entities?] Use the \lstinline$MPI_Type_contiguous()$ and \lstinline$MPI_Type_vector()$ functions.
 	\end{description} 
 \end{description}
 
@@ -722,7 +736,7 @@ affect performance?] \hfill
 \subsection{Shared-memory programming with OpenMP}
 
 \begin{description}[style=nextline]
-	\item[Basic principle of OpenMP] \hfill
+	\item[Basic principle of OpenMP] Extend an existing application by using \texttt{\#pragma} directives. Worksharing is used to distribute loops, sections to multiple threads on a shared-memory machine.
 
 	\begin{description}[style=nextline]
 		\item[Execution model] \hfill
@@ -730,7 +744,7 @@ affect performance?] \hfill
 		\item[Parallel region + worksharing constructs] \hfill
  
 	\end{description}
-	\item[Scoping] \hfill
+	\item[Scoping] There are OpenMP clauses the specifiy the scope (shared or private) of variables.
 
 	\begin{description}[style=nextline]
 		\item[Data sharing clauses] \hfill
