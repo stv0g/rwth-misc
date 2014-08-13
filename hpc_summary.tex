@@ -259,15 +259,33 @@ All MPI routines return an integer error code!
 
 \subsection{OpenMP}
 
-\begin{tabular}{ p{7cm} l }
-	\lstinline$#pragma omp parallel$ & \\
-	\lstinline$#pragma omp for [simd]$ & \\
-	\lstinline$#pragma omp sections$ & \\
+\begin{tabular}{ p{7cm} p{9cm} }
+	\lstinline$#pragma omp parallel$ & Forms a team of threads and starts parallel execution. \\
+	\lstinline$#pragma omp for$ & Split iterations of following for loop across threads.  \\
+	\lstinline$#pragma omp sections$ & Non-iterative worksharing of diffrent sections. \\
 	\lstinline$#pragma omp section$ & \\
-	\lstinline$#pragma omp task$ & \\
+	\lstinline$#pragma omp single$ & Region shall only be executed by a single thread. \\
+	\lstinline$#pragma omp critical$ & Region is executed by all threads but only by a single simultaneously. \\
+	\lstinline$#pragma omp barrier$ & All tasks created by any thread of the current team are guaranteed to complete at barrier exit. \\
+	\lstinline$#pragma omp taskwait$ & Encountering task suspends until all (direct) child tasks are complete. \\
+	\lstinline$#pragma omp task$ & Defines an explicit task. \\
 	\lstinline$#pragma omp target [data]$ & \\
 	\lstinline$#pragma omp distribute$ & \\
 	\lstinline$#pragma omp teams$ & \\ 
+\end{tabular}
+
+\subsubsection{Clauses}
+
+\begin{tabular}{ p{7cm} p{9cm} }
+	\lstinline$num_threads(cnt)$ & Number of threads for a parallel region. \\
+	\lstinline$default(shared|none)$ & Set default scope. \\
+	\lstinline$[first|last]private(list)$ & Thread private scope. \\
+	\lstinline$shared(list)$ & Shared scope among thread team. \\
+	\lstinline$proc_bind(master|close|spread)$ & OMP places? \\
+	\lstinline$nowait, untied$ & \\
+	\lstinline$reduction(op:list)$ & Do reduction after parallel block. \\
+	\lstinline$schedule(kind,chunk_size)$ & \\
+	\lstinline$if(condition)$ & Only fork/enter thread/parallel region if \texttt{condition} is true. \\
 \end{tabular}
 
 \subsubsection{Environment variables}
@@ -280,17 +298,23 @@ All MPI routines return an integer error code!
 
 \subsubsection{Runtime API}
 
-\begin{tabular}{ p{7cm} l }
-	\lstinline$omp_set_num_threads(n)$ & \\
+\begin{tabular}{ p{7cm} p{9cm} }
+	\lstinline$omp_{set,get}_num_threads(n)$ & Get/set the number of threads used for the encountering region. \\
+	\lstinline$omp_get_thread_num()$ & Returns the number of the current thread (see \lstinline$MPI_Comm_rank()$).
+	
 \end{tabular}
 
 \subsection{OpenACC}
 
 \begin{tabular}{ p{7cm} l }
-	\lstinline$#pragma acc parallel [loop]$ & \\
+	\lstinline$#pragma acc parallel [loop, d-clauses]$ & \\
+	\lstinline$#pragma acc kernels [loop, d-clauses]$ & \\
+	\lstinline$#pragma acc loop [gang, reduction(op:list)]$ & \\
 	\lstinline$#pragma acc wait$ & \\
-	\lstinline$#pragma acc parallel$ & \\
-	\lstinline$#pragma acc kernel$ & \\
+	\lstinline$#pragma acc data [d-clauses]$ & \\
+	\lstinline$#pragma acc update {host,device}(data)$ & \\
+	\lstinline$#pragma acc {enter,exit} data [d-clauses]$ & \\
+	\lstinline$#pragma acc routine (name)$ & \\
 \end{tabular}
 
 \section{LSF}
@@ -724,12 +748,12 @@ See \texttt{man bsub}.
 	\end{description}
 	\item[Virtual topologies] 
 	\begin{description}[style=nextline]
-		\item[How to distribute processes over a regular grid?] Use the \lstinline$MPI_Cart_*()$ set of functions.
+		\item[How to distribute processes over a regular grid?] Use the \lstinline$MPI_Cart_*()$ to create a new MPI communicator. There are functions to translate MPI ranks to coordinates as well to split grids and get adjacent ranks.
 
 	\end{description}
 	\item[Derived datatypes]
 	\begin{description}[style=nextline]
-		\item[How to combine MPI datatypes into more complex entities?] Use the \lstinline$MPI_Type_contiguous()$ and \lstinline$MPI_Type_vector()$ functions.
+		\item[How to combine MPI datatypes into more complex entities?] Use the \lstinline$MPI_Type_contiguous()$ and \lstinline$MPI_Type_vector()$ functions. Type signature must be the same between processes, gaps \& alignment are allowed to differ (architectural properties).
 	\end{description} 
 \end{description}
 
@@ -740,11 +764,10 @@ See \texttt{man bsub}.
 	\item[Basic principle of OpenMP] Extend an existing application by using \texttt{\#pragma} directives. Worksharing is used to distribute loops, sections to multiple threads on a shared-memory machine.
 
 	\begin{description}[style=nextline]
-		\item[Execution model] \hfill
-
-		\item[Parallel region + worksharing constructs] \hfill
- 
+		\item[Execution model] OpenMP programs start with a single master thread. Worker threads are spawned/joined by the master in parallel regions => Fork/Join concept.
+		\item[Parallel region + worksharing constructs] OpenMP handles the thread management work.
 	\end{description}
+
 	\item[Scoping] There are OpenMP clauses the specifiy the scope (shared or private) of variables.
 
 	\begin{description}[style=nextline]
@@ -811,34 +834,36 @@ See \texttt{man bsub}.
 \subsubsection{GPGPU's}
 
 \begin{description}[style=nextline]
-	\item[How does a GPU look like?] \hfill
+	\item[How does a GPU look like?] A GPGPU is a manycore architecture optimized for high data-parallel throughput. It consists of  multiple streaming processors (SM), which itself consists of many cores.
 
 	\begin{description}[style=nextline]
-		\item[Why do GPUs deliver a good performance per Watt ratio?] \hfill
+		\item[Why do GPUs deliver a good performance per Watt ratio?] GPGPUs have small caches, many low frequency cores and little control logic. Memory is close to the processing unit.
 
-		\item[What is the difference to CPUs?] \hfill
+		\item[What is the difference to CPUs?] There are more transistors dedicated to computation instead of controlling.
+		A CPU has large caches with multiple levels, supports OoO execution, sophisticated control logic like speculative execution and hw-scheduling of microops.
  
-		\item[How does the memory hierarchy look like?] \hfill
+		\item[How does the memory hierarchy look like?] Each SM has seperated shared memories, caches, registers and texture storage. All SM have access to a common LLC and global memory of the GPU. This global memory is seperated from the host. There's no cache coherence for GPU caches! Communication with the host has to be done by DMA transfers.
  
-		\item[How can the logical programming hierarchy be mapped to the execution model?] \hfill
+		\item[How can the logical programming hierarchy be mapped to the execution model?] The execution model is host-directed. Portions of the code, so called "kernels" are offloaded to the GPU. These kernels are executed highly parallel by an array of threads.
  
 	\end{description}
-	\item[Which models can be used to program a GPU?] \hfill
+	\item[Which models can be used to program a GPU?] There are special GPU programming APIs like CUDA and more general directive based models like OpenACC/MP.
 
 	\begin{description}[style=nextline]
-		\item[How to handle offloading of regions?] \hfill
+		\item[How to handle offloading of regions?] Programmer has to find regions which can be parallelized. These "kernels" are compiled to special GPU code and called by the host.
 
-		\item[How to handle data management?] \hfill
+		\item[How to handle data management?] Data transfer has to be done explicitly.
  	
 		\item[What are the main differences?] \hfill
  
 	\end{description}
-	\item[Which impact does the PCIe have?] \hfill
+	\item[Which impact does the PCIe have?] Usually GPUs are have very fast memory. The PCIe bus isn't fast enough to saturate this memory bandwidth => bottleneck.
 
-	\item[What is branch divergence?] \hfill
+	\item[What is branch divergence?] 32 threads are joined to "warps". These warps share a common program counter => branches are serialized inside warps.
 
 	\begin{description}[style=nextline]
-		\item[Which performance impact does it have?] \hfill
+		\item[Which performance impact does it have?] Branch divergancy causes threads which doesn't took a branch to idle.
+		It therefore leds to performance degration => Branch only with sets of multiple warps.
 
 	\end{description}
 	\item[What can be a good launch configuration and why?] \hfill
@@ -847,7 +872,7 @@ See \texttt{man bsub}.
 		\item[How can the launch configuration be specified?] \hfill
 
 	\end{description}
-	\item[What can be done to saturate the bus?] \hfill
+	\item[What can be done to saturate the bus?] Maximize PCIe throughput by transfer less data, batch smaller transfers to larger ones.
 
 	\begin{description}[style=nextline]
 		\item[What is coalescing?] \hfill
@@ -859,9 +884,9 @@ See \texttt{man bsub}.
 		\item[What is the difference between caching and non-caching loads?] \hfill
  
 	\end{description}
-	\item[What is shared memory?] \hfill
+	\item[What is shared memory?] CUDA block have dedicated shared memory. This can be used for low-latency inter-thread communication.
 
-	\item[How to avoid CPU/ GPU idling?] \hfill
+	\item[How to avoid CPU/ GPU idling?] Use asynchronous data transfer and CUDA streams to enqueue multiple kernel for inorder execution.
 
 \end{description}
 
