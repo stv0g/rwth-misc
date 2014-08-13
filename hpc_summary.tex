@@ -383,9 +383,9 @@ TODO
 	\begin{description}[style=nextline]
 		\item[What is a cache?] It's a high speed memory with low capacity which is usually organized in multiple layers. Commonly the caches are integrated into the CPU dia for high bandwidth.
 
-		\item[What performance characteristics does it have?] High speed: allows multiple transfers per cycle
+		\item[What performance characteristics does it have?] High speed: usually allows multiple transfers per cycle
 
-		\item[When does it makes sense to use a cache?] If compution performance is limited by memory bandwidth
+		\item[When does it makes sense to use a cache?] If compution performance is limited by memory bandwidth ("memory-bound problems").
 
 		\item[What are cache hits/misses?] Cache hits occur when requested items are currently hold in the cache. Otherwise a cache miss happens.
 
@@ -400,10 +400,11 @@ TODO
 		\item Trace/Mircro-OP cache => stores decoded instructions
 	\end{itemize}
 
-	\item[Why is cache coherence important?] \hfill
+	\item[Why is cache coherence important?] Memory contents have to kept consistent across mutliple cores.
 
 	\begin{description}[style=nextline]
-		\item[How is the coherence achieved?] \hfill
+		\item[How is the coherence achieved?] By using cache invalidation procotols like MESI. \\
+		Write-back/write-through strategies.
 
 	\end{description}
 	\item[When is prefetching used?] Prefetching is used to continously fetch data from the main memory. Cache misses usually trigger prefetches of the neighboring cache line.
@@ -414,41 +415,52 @@ TODO
 \subsection{Basic optimization techniques for serial code}
 
 \begin{description}[style=nextline]
-	\item[What is a hot spot?] \hfill
+	\item[What is a hot spot?] A part of the code where a dominant fraction of the execution time is spent.
 
-	\item[What kind of trigger mechanisms do exist?] \hfill
+	\item[What kind of trigger mechanisms do exist?] Event-driven and trigger-driven.
 
 	\begin{description}[style=nextline]
-		\item[What is the difference between event-driven and sample-driven triggers?] \hfill
+		\item[What is the difference between event-driven and sample-driven triggers?] \textbf{Event}-driven triggers count accuratly every occurance by using instrumentation or PMCs => probably high overhead. \
+		\textbf{Sample}-driven triggers save the state/PC at periodic times => constant overhead.
 
-		\item[What is instrumentation?] \hfill
+		\item[What is instrumentation?] Instrumentation is used to trigger events during runtime by putting additional instructions in an existing program. This may be done by libraries, emulators or the compiler or the programmer itself.
  
 	\end{description}
-	\item[What kind of recording mechanisms do exist?] \hfill
+	\item[What kind of recording mechanisms do exist?] Profiling and Tracing.
  
 	\begin{description}[style=nextline]
-		\item[What is the difference between profiling and tracing?] \hfill
+		\item[What is the difference between profiling and tracing?] Profiling summaries information about the runtime spent per routine/line/block. Tracing collects call-paths with timing information and is therefore much more detailed.
 
 	\end{description}
-	\item[What can hardware performance counter measure?] \hfill
- 
+	\item[What can hardware performance counter measure?] PMCs are MSRs/hw-counters to measure processor events like cache/branch-misses, loads/stores and much more.
 
-	\item[What are basic single-core optimizations?] \hfill
+	\item[What are basic single-core optimizations?]
+	\begin{itemize}
+		\item Do-less work
+		\item Avoid expensive operations
+		\item	Shrink the working set
+		\item Eliminate common subexpressions
+		\item Avoid branches
+		\item Use SIMD instruction sets
+		\item Support the compiler use flags wisely
+		\item C++
+		
+	\end{itemize}
 
 	\begin{description}[style=nextline]
-		\item[What are simple loop optimizations?] \hfill
+		\item[What are simple loop optimizations?] Break-out the loop as soon as possible. Jam neighbouring loops.
 
-		\item[How to avoid expensive operations?] \hfill
+		\item[How to avoid expensive operations?] Use precalculated tables for fast lookup of results.
  
-		\item[What to consider with data types?] \hfill
+		\item[What to consider with data types?] Aligning is important. Take care when using SIMD.
  
-		\item[How can temporary variables increase performance?] \hfill
+		\item[How can temporary variables increase performance?] They can be kept in registers and therefore reduce the memory transations.
  
-		\item[Can vectorization help for memory-bound programs?] \hfill
+		\item[Can vectorization help for memory-bound programs?] No.
  
-		\item[What is the role of the compiler?] \hfill
+		\item[What is the role of the compiler?] Register usage, inlining, general optimizations
  
-		\item[What are problems with C++ codes?] \hfill
+		\item[What are problems with C++ codes?] Avoid frequent (de)allocation, use static varibales whenever possible, avoid using to much abstraction.
  
 	\end{description}
 \end{description}
@@ -457,30 +469,30 @@ TODO
 \subsection{Data access optimization}
 
 \begin{description}[style=nextline]
-	\item[What can be modelled with the balance metric?] \hfill
+	\item[What can be modelled with the balance metric?] Ratio of memory bandwidth [Words/s] to peak performance [Flops/s].
 
 	\begin{description}[style=nextline]
-		\item[How are lightspeed, machine and code balance defined?] \hfill
+		\item[How are lightspeed, machine and code balance defined?] See formulars.
 
-		\item[How can we get values for lightspeed, machine and code balance?] \hfill
+		\item[How can we get values for lightspeed, machine and code balance?] Count \# of load/stores and arithmetic operations per loop iteration.
  
-		\item[What are the limitations of this model?] \hfill
+		\item[What are the limitations of this model?] Expects peak performance: saturated pipelines, superscalarity. Latency is ignored. Data transfer and calculation overlaps perfectly.
  
 	\end{description}
-	\item[How can algorithms be classified depending on the number of arithmetic operations and data transfers?] \hfill
+	\item[How can algorithms be classified depending on the number of arithmetic operations and data transfers?] By the scaling behaviour of memory transactions and arithmetic operations vs. problem size: $O(N), O(N^2), ...$.
 
 	\begin{description}[style=nextline]
-		\item[Which algorithm types have potential for optimizations?] \hfill
+		\item[Which algorithm types have potential for optimizations?] Memory-bound usually not so much. Take care for computate-bound problems: \( \frac{O(N^3)}{O(N^2)} \).
 
-		\item[Which optimizations should be applied?] \hfill
+		\item[Which optimizations should be applied?] Loop unrolling, jamming and blocking.
  
 	\end{description} 
-	\item[Sparse matrix-vector multiply] \hfill
+	\item[Sparse matrix-vector multiply] Number of non-zero entries grows linearly with number of matrix rows.
  
 	\begin{description}[style=nextline]
-		\item[How can sparse matrices be stored and why?] \hfill
+		\item[How can sparse matrices be stored and why?] Compressed row storage (CRS): store only non-zero entries by using additional index- and row-pointer- arrays.
 
-		\item[How is the sparse matrix-vector multiply computed and optimized?] \hfill
+		\item[How is the sparse matrix-vector multiply computed and optimized?] Workingset shrinking by using CRS, loop unrolling, etc..
  
 	\end{description}
 \end{description}
@@ -489,32 +501,33 @@ TODO
 \subsection{Parallel computers}
 
 \begin{description}[style=nextline]
-	\item[Which taxonomy for parallel computing does exist?] \hfill
+	\item[Which taxonomy for parallel computing does exist?] Flynns: SIMD, MIMD, (SISD, MISD)
 
-	\item[What can limit scalability?] \hfill
+	\item[What can limit scalability?] Serial parts: synchronization and communication
 
-	\item[What does Amdahl’s Law (strong scaling) say?] \hfill
+	\item[What does Amdahl's Law (strong scaling) say?] For a fixed data set, speedup $S_p$ converges with increasing number of workers towards $\frac{1}{s}$, where $s$ denotes the fraction of serial code.
 
-	\item[What does Gustafson’s Law (weak scaling) say?] \hfill
+	\item[What does Gustafson's Law (weak scaling) say?] For an arbitrarily large data set, speedup $S_p$ grows linearly with the number $N$ of parallel workers: $N p + s$ with $p = 1 - s$. \\
+	Does not model the reality!
 
-	\item[What is a of multicore processors?] \hfill
+	\item[What is a advantage? of multicore processors?] Higher performance is feasible with lower clock frequencies and therefore lower energy consumption.
 
 	\begin{description}[style=nextline]
-		\item[Why do we have multicore processors?] \hfill
+		\item[Why do we have multicore processors?] Increasing the clock rate would require enormous cooling efforts which arn't economic.
 
 	\end{description}
-	\item[Which advantages do SMT have?] \hfill
+	\item[Which advantages do SMT have?] Improves the exploitation of ILP. Increase in piplined throughput.
  
-	\item[What is a shared-memory computer?] \hfill
+	\item[What is a shared-memory computer?] Multiple cores are using the same main memory and address space.
  
 	\begin{description}[style=nextline]
-		\item[What is the difference between UMA and ccNUMA?] \hfill
+		\item[What is the difference between UMA and ccNUMA?] The flat model of uniform memory access (UMA) has equal costs for memory accesses across all cores. Their memory is connected to a shared chipset. Non-uniform memory access (NUMA) costs are dependent on the path between the memory and the socket which initiates the transfer. Memory is connected directly to sockets and/or distributed accross multiple boards which are connected by custom interconnects (mostly propriatary: QPI, HT).
 
 	\end{description}
-	\item[What is a distributed-memory computer?] \hfill
+	\item[What is a distributed-memory computer?] Unlike (N)UMA systems, so called "No Remote Memory Access" (NORMA) systems don't have a common address space. Their nodes a coupled via networks and use message passing to communicate.
  
 	\begin{description}[style=nextline]
-		\item[How do hybrid systems look like?] \hfill
+		\item[How do hybrid systems look like?] They combine shared and distributed memory aspects in one cluster. Multiple shared memory nodes are coupled to a distributed system => multiple isles of cache corherence!
 
 	\end{description}
 \end{description}
@@ -522,23 +535,32 @@ TODO
 \subsubsection{Networks}
 
 \begin{description}[style=nextline]
-	\item[Which network performance metrics do exist?] \hfill
+	\item[Which network performance metrics do exist?]
+	\begin{itemize}
+		\item Bisection (band)width $b$: \# of edges which have to be removed to split the network into two (equal sized) halves.
+		\item Diameter $dm$: Max distance between to nodes/processors.
+		\item Edge connectivity $e$: Min \# of edges that must be removed to break the network it into two disconnected parts.
+		\item Node connectivity $\delta$: Max \# of edges in the graph per node (max degree).
+	\end{itemize}
 
 	\begin{description}[style=nextline]
-		\item[What can the PingPong benchmark model (latency, effective bandwidth)?] \hfill
+		\item[What can the PingPong benchmark model (latency, effective bandwidth)?] \textbf{Small} messages have larger overhead and therefore lower effective bandwidth (latency dominates). \\
+		\textbf{Large} messages have less overhead better effective bandwidth (latency plays no role).
 
-		\item[What does the LogP model do?] \hfill
- 
-		\item[What are the definitions for bisection bandwidth, diameter \& edge connectivity?] \hfill
+		\item[What does the LogP model do?] Generic model for scaling behaviour of connections between parallel systems. It includes:
+		\begin{description}
+			\item[L] Upper boundary on latency for one transfer
+			\item[o] Overhead: time that a processor is involved with the transfer
+			\item[g] Gap: minimum time interval between to consective transfers.
+			\item[P] The number of processors
+		\end{description} 
+		\item[What are the definitions for bisection bandwidth, diameter \& edge connectivity?] See above.
  
 	\end{description}
-	\item[What are relevant network topologies in HPC?] \hfill
+	\item[What are relevant network topologies in HPC?] See table above.
  
 	\begin{description}[style=nextline]
-		\item[What are the bisection bandwidth, diameter, node \& edge connectivity of
-networks such as Ring, Bus, Switched/Fat Tree, Meshes, Hypercubes, Tori,
-Hybrids?] \hfill
-		
+		\item[What are the bisection bandwidth, diameter, node \& edge connectivity of networks such as Ring, Bus, Switched/Fat Tree, Meshes, Hypercubes, Tori, Hybrids?] See tables above.
 	\end{description}
 \end{description}
 
