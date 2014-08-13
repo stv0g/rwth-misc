@@ -332,44 +332,86 @@ See \texttt{man bsub}.
 			\item Tianhe-2 (33 PFlops/s)
 			\item Titan (17 PFlops/s)
 		\end{enumerate}
-	\item[What can we read from the performance development as measured in the TOP500?] The TOP500 lists by peak performance $R_max$ in Flops/s (double) measured by a standardized benchmark (LIN/LAPACK). \\
-	Future trends are predictable (exascale computing, architectures).
+	\item[What can we read from the performance development as measured in the
+        TOP500?] The TOP500 lists by peak performance $R_{max}$ in Flops/s (double) measured by a standardized benchmark (LIN/LAPACK). \\
+	Future trends are predictable (exascale computing, architectures).\\
+    At the moment, it takes approximately 11 years to increase performance by 1
+    order of magnitude (1 ExaFlop/s projected for 2019).
 	
-	\item[What does Moore's Law tell you? Is it still valid?] "The number of transistors per chhip doubles around every one to two years." \\
-	Slope is now declining slowy. But mostly still valid.
+	\item[What does Moore's Law tell you? Is it still valid?] "The number of transistors per chip doubles around every one to two years." \\
+	Slope is now declining slowly. But mostly still valid.
 	
-	\item[Why do we have multi-core architectures today?] Clock frequencies can't pushed further due to limited cooling capabilities. \\
+	\item[Why do we have multi-core architectures today?] Clock frequencies can't be pushed further due to limited cooling capabilities. \\
 	Solution: Decrease frequency; increase die-size by putting more cores on a single chip and exploit parallelism.
 	
 \end{description}
 
 \newpage
-\subsection{Energy Efficency}
+\subsection{Energy Efficiency}
 
 \begin{description}[style=nextline]
-	\item[What is the power wall?] 20 to 25 MegaWatt of energy consumption is considered an important barrier for HPC centres.
+	\item[What is the power wall?] 20 to 25 MegaWatt of energy consumption is
+        considered an important barrier for HPC centres.\\
+        The power wall gives us an upper limit on power consumption.
 
-	\item[What is the problem?] To meet the exa-scale goal in 2019, the current trend of energy efficiency isn't sufficient. \\
-	Power consumption will become the dominating cost factor for operate clusters in the future.
+	\item[What is the problem?] 
+    To meet the exa-scale goal in 2019, the current trend of energy efficiency isn't sufficient.
+	Power consumption will become the dominating cost factor for
+    operate clusters in the future, with energy costs surpassing investment costs.
+	\begin{description}[style=nextline]
+		\item[Aspects of energy efficency] Energy efficiency is continuously
+            improving. To meet the exa-scale goal this has to be focused more by using 
+            new architectures (accelerators).
+            At the moment, we have a performance increase of 2 orders of magnitude
+            every 7 years while energy efficiency
+            ($\frac{\text{power consumption}}{\text{Flop/s}}$) decreases by only 1 order
+            of magnitude in the same time.
+            This means power consumption is increasing 1 order of magnitude every 7
+            years.
+
+		\item[Physical descriptions \& limits] 
+            Landauer's principle: "Changing one bit of information needs at
+            least an amount of energy of $ln(2) \cdot k \cdot T$". \\
+		    The current top Green500 systems are about 10 orders of magnitude away from this limitation.
+
+    \end{description}
+
+    \item[How can we benchmark energy efficency?] Measure only the consumption of a
+    single rack (submodule) and extrapolate. Average over different benchmarks. 
 
 	\begin{description}[style=nextline]
-		\item[Aspects of energy efficency] Energy efficiency is continously improving. To meed the exa-scale goal this has to focused more by using new architectures (accelerators).
-
-		\item[Physical descriptions \& limits] Landauer's principle: "Changing one bit of intermation needs at least an amount of energy of $ln(2) \cdot k \cdot T$". \\
-		The current top Green500 systems are about 10 magnitues away from this limitation.
-
+		\item[Advantages \& disadvantages of Green500, SPEC Power] 
+        High variations in idle and during benchmarks and between nodes.
+        Power extrapolation may not be allowed.
+        The Green500 assumes that the computational workload during the Linpack
+        benchmark is well-balanced across all units and that all units are
+        identical and have the same power consumption for the same workload.
+        Those assumptions are however very dangerous and often wrong. Idle and
+        Linpack power consumption can vary from node to node as well as over
+        time.
 	\end{description}
-	\item[How can we benchmark energy efficency?] Measure only the consumption of a single rack and extrapolate. Average over diffrent benchmarks. 
 
-	\begin{description}[style=nextline]
-		\item[Advantages \& disadvantages of Green500, SPEC Power] High variations in idle and during benchmarks and between nodes. Power extrapolation may not be allowed.
-
-	\end{description}
-	\item[What are the architectural aspects of energy efficency?] Current von Neumann architectures were'nt designed with energy efficiency in mind: OoO execution, cache coherency and prefetchers are inefficient. \\
-	Desktop/mobile power saving methods are applied to HPC (C and P-states).
+    \item[What are the architectural aspects of energy efficency?] 
+        Current von Neumann architectures weren't designed with energy 
+        efficiency in mind: 
+        OoO execution, cache coherency and prefetchers are inefficient. \\
+	    Desktop/mobile power saving methods are applied to HPC (C and
+        P-states) C0 is the operating state, everything above is an idle state.
+        With increasing numbers, more and more parts are shut down to conserve
+        energy (at the cost of an increased wakeup time). P-states are all
+        operational states, but they switch between supported frequencies \&
+        voltages to save energy in case maximal performance is not needed
+        $\Longrightarrow$ DVFS.\\
+        There are many parameters that affect energy efficiency: number of
+        cores, clock frequency, prefetcher, SMT, branch prediction, GPU clock
+        frequency, cache size, speed of interconnects. It is important to find
+        sweet spots for those parameters, not only for whole applications but
+        also for each application phase. 
 	
 	\begin{description}[style=nextline]
-		\item[What is dynamic frequency and voltage scaling?] Reduce voltage/frequency during idle times to save energy. Implemented by processor P-states.
+		\item[What is dynamic frequency and voltage scaling?] 
+            Reduce voltage/frequency during idle times to save energy. 
+            Implemented by processor P-states.
 
 	\end{description}
 	\item[What are the future plans to climb the power wall?]
@@ -391,7 +433,8 @@ See \texttt{man bsub}.
 \subsection{Modern Processors}
 
 \begin{description}[style=nextline]
-	\item[What is an ISA?] The for Instruction Set Architecture is the part of an architecture which is visible to the application programmer / compiler.
+	\item[What is an ISA?] The Instruction Set Architecture is the part of an
+        architecture that is visible to the application programmer / compiler.
 
 	\begin{description}[style=nextline]
 		\item[What are the differences in ISA's?]
