@@ -818,8 +818,8 @@ See \texttt{man bsub}.
 	\end{itemize} 
 
 	\begin{description}[style=nextline]
-		\item[What overhead do the different types have \& how can it be reduced?] Overhead increases
-			from instruction to system level parallelism.
+		\item[What overhead do the different types have \& how can it be reduced?]
+			Overhead increases from instruction to system level parallelism.
 			Overhead includes Amdahl's Law implications as well as the additional time required for implementation!
 			Use compiler optimization and existing patterns to reduce implementation overhead.
 
@@ -829,8 +829,8 @@ See \texttt{man bsub}.
 			\item[Critial Path] Length of the longest path (sum of weights)
 			\item[Avg Concurrency] Ratio of total amount of work to critical path length.
 		\end{description}
-
 	\end{description}
+
 	\item[Which parallel design spaces \& patterns are defined by Mattson?]
 	\begin{itemize}
 		\item Finding Concurrency: Dependency Analysis \& Decomposition.
@@ -849,19 +849,18 @@ See \texttt{man bsub}.
 			solve than the others. These threads are called "speeders" \& "laggers". \\
 			There are geometric and graph-based load balancing methods which are statically or dynamic.
  
-		\item[What are differences between SPMD, Master/Worker, Loop Parallelism and Fork/Join? Name a typical example.] All
-			these are supporting structures to parallelize algorithms.
+		\item[What are differences between SPMD, Master/Worker, Loop Parallelism and Fork/Join? Name a typical example.]
+			All these are supporting structures to parallelize algorithms.
 			SPMD and Loop Parallelism execute the same code on multiple UEs.
 			Master/Worker, Fork/Join offer a greater flexibility in this regard.
 
-		\item[What does NUMA affinity mean? How can memory placement and binding affect performance?] For
-			optimal performance, data has to be closely located to the cores which are using it.
-			Modern OSes use "affinity on first touch" which allocates memory on the same socket
-			where the task is executed.
+		\item[What does NUMA affinity mean? How can memory placement and binding affect performance?]
+			For optimal performance, data has to be closely located to the
+			cores which are using it. Modern OSes use "affinity on first touch"
+			which allocates memory on the same socket where the task is executed.
 	\end{description}
 	
 	\item[Which are typical approaches in a Molecular Dynamics application?]
-
 	\begin{itemize}
 		\item Particle Decomposition
 		\item Force Decomposition
@@ -873,11 +872,12 @@ See \texttt{man bsub}.
 \subsection{Distributed-memory programming with MPI}
 
 \begin{description}[style=nextline]
-	\item[Basic ideas of MPI] Don't rely on cache coherence. Use messages to communicate between
-		workers/UEs => SPMD.
+	\item[Basic ideas of MPI] Don't rely on cache coherence.
+		Use messages to communicate between workers/UEs => SPMD.
 
 	\begin{description}[style=nextline]
-		\item[What is SPMD and how is it implemented by MPI?] All workers execute the same program.
+		\item[What is SPMD and how is it implemented by MPI?]
+			All workers execute the same program.
 			Program flow is directed by so called "ranks" which are unique per process.
 
 		\item[How MPI abstracts the communication?] MPI provides a runtime API with a large set of
@@ -888,14 +888,16 @@ See \texttt{man bsub}.
 
 	\item[Point-to-point operations] 
 	\begin{description}[style=nextline]
-		\item[How to transfer data between processes in the form of messages?] Use \lstinline$MPI_Send()$,
-			\lstinline$MPI_Recv()$ functions (or their variants) for point-to-point communication.
+		\item[How to transfer data between processes in the form of messages?]
+			Use \lstinline$MPI_Send()$, \lstinline$MPI_Recv()$ functions
+			(or their variants) for point-to-point communication.
 			See API reference above.
-
-		\item[How to prevent deadlocks and overlap communication and computation?] Use non-blocking
-			\lstinline$MPI_Isend()$, \lstinline$MPI_Irecv()$ in conjunction with the MPI request
-			methods \lstinline$MPI_Wait()$ and \lstinline$MPI_Test()$. \\
-			Alternatively a deadlock-free \lstinline$MPI_Sendrecv()$ is available which combines sending and receiving in on function call.
+		\item[How to prevent deadlocks and overlap communication and computation?]
+			Use non-blocking \lstinline$MPI_Isend()$, \lstinline$MPI_Irecv()$
+			in conjunction with the MPI request methods \lstinline$MPI_Wait()$
+			and \lstinline$MPI_Test()$. \\
+			Alternatively a deadlock-free \lstinline$MPI_Sendrecv()$ is available
+			which combines sending and receiving in on function call.
 	\end{description}
 	
 	\item[Collective operations]
@@ -906,8 +908,9 @@ See \texttt{man bsub}.
 
 	\item[Virtual topologies] 
 	\begin{description}[style=nextline]
-		\item[How to distribute processes over a regular grid?] Use the \lstinline$MPI_Cart_*()$ to create
-			a new MPI communicator. There are functions to translate MPI ranks to coordinates
+		\item[How to distribute processes over a regular grid?]
+			Use the \lstinline$MPI_Cart_*()$ to create a new MPI communicator.
+			There are functions to translate MPI ranks to coordinates
 			as well to split grids and get adjacent ranks.
 	\end{description}
 	
@@ -915,8 +918,8 @@ See \texttt{man bsub}.
 	\begin{description}[style=nextline]
 		\item[How to combine MPI datatypes into more complex entities?] Use the
 			\lstinline$MPI_Type_contiguous()$ and \lstinline$MPI_Type_vector()$ functions.
-			Type signature must be the same between processes, gaps \& alignment are allowed to
-			differ (architectural properties).
+			Type signature must be the same between processes,
+			gaps \& alignment are allowed to differ (architectural properties).
 	\end{description} 
 \end{description}
 
@@ -924,12 +927,15 @@ See \texttt{man bsub}.
 \subsection{Shared-memory programming with OpenMP}
 
 \begin{description}[style=nextline]
-	\item[Basic principle of OpenMP] Extend an existing application by using \texttt{\#pragma} directives.
-		Worksharing is used to distribute loops, sections to multiple threads on a shared-memory machine.
+	\item[Basic principle of OpenMP] Extend an existing application by
+		using \texttt{\#pragma} directives.
+		Worksharing is used to distribute loops, sections to multiple threads
+		on a shared-memory machine.
 
 	\begin{description}[style=nextline]
 		\item[Execution model] OpenMP programs start with a single master thread.
-			Worker threads are spawned/joined by the master in parallel regions => Fork/Join concept.
+			Worker threads are spawned/joined by the master
+			in parallel regions => Fork/Join concept.
 		\item[Parallel region + worksharing constructs] OpenMP handles the thread management work.
 	\end{description}
 
@@ -999,12 +1005,14 @@ See \texttt{man bsub}.
 \subsubsection{GPGPU's}
 
 \begin{description}[style=nextline]
-	\item[How does a GPU look like?] A GPGPU is a manycore architecture optimized for high data-parallel throughput.
+	\item[How does a GPU look like?]
+		A GPGPU is a manycore architecture optimized for high data-parallel throughput.
 		It consists of  multiple streaming processors (SM), which itself consists of many cores.
 
 	\begin{description}[style=nextline]
 		\item[Why do GPUs deliver a good performance per Watt ratio?] GPGPUs have small caches,
-			many low frequency cores and little control logic. Memory is close to the processing unit.
+			many low frequency cores and little control logic.
+			Memory is close to the processing unit.
 
 		\item[What is the difference to CPUs?] There are more transistors dedicated to computation
 			instead of controlling. A CPU has large caches with multiple levels,
@@ -1018,17 +1026,19 @@ See \texttt{man bsub}.
 			There's no cache coherence for GPU caches!
 			Communication with the host has to be done by DMA transfers.
  
-		\item[How can the logical programming hierarchy be mapped to the execution model?] The execution model is host-directed.
+		\item[How can the logical programming hierarchy be mapped to the execution model?]
+			The execution model is host-directed.
 			Portions of the code, so called "kernels" are offloaded to the GPU.
-			These kernels are executed highly parallel by an array of threads.
- 
+			These kernels are executed highly parallel by an array of threads. 
 	\end{description}
+
 	\item[Which models can be used to program a GPU?] There are special GPU programming APIs
 		like CUDA and more general directive based models like OpenACC/MP.
 
 	\begin{description}[style=nextline]
-		\item[How to handle offloading of regions?] Programmer has to find regions which can be parallelized.
-		These "kernels" are compiled to special GPU code and called by the host.
+		\item[How to handle offloading of regions?] Programmer has to find regions
+			which can be parallelized.
+			These "kernels" are compiled to special GPU code and called by the host.
 
 		\item[How to handle data management?] Data transfer has to be done explicitly.
  	
@@ -1042,31 +1052,32 @@ See \texttt{man bsub}.
 		These warps share a common program counter => branches are serialized inside warps.
 
 	\begin{description}[style=nextline]
-		\item[Which performance impact does it have?] Branch divergancy causes threads which doesn't took a branch to idle.
-		It therefore leds to performance degration => Branch only with sets of multiple warps.
-
+		\item[Which performance impact does it have?]
+			Branch divergancy causes threads which doesn't took a branch to idle.
+			It therefore leds to performance degration =>
+			Branch only with sets of multiple warps.
 	\end{description}
-	\item[What can be a good launch configuration and why?] \hfill
- 
+
+	\item[What can be a good launch configuration and why?] \hfill 
 	\begin{description}[style=nextline]
 		\item[How can the launch configuration be specified?] \hfill
-
 	\end{description}
-	\item[What can be done to saturate the bus?] Maximize PCIe throughput by transfer less data, batch smaller transfers to larger ones.
+
+	\item[What can be done to saturate the bus?] Maximize PCIe throughput by transfer
+		less data, batch smaller transfers to larger ones.
 
 	\begin{description}[style=nextline]
 		\item[What is coalescing?] \hfill
-
 		\item[How can it be achieved?] \hfill
- 
 		\item[What impact does AoS and SoA have?] \hfill
- 	
 		\item[What is the difference between caching and non-caching loads?] \hfill
- 
 	\end{description}
-	\item[What is shared memory?] CUDA SM/blocks have dedicated shared memory. This can be used for low-latency inter-thread communication.
 
-	\item[How to avoid CPU/ GPU idling?] Use asynchronous data transfers and CUDA streams to enqueue multiple kernels for  execution.
+	\item[What is shared memory?] CUDA SM/blocks have dedicated shared memory.
+		This can be used for low-latency inter-thread communication.
+
+	\item[How to avoid CPU/ GPU idling?] Use asynchronous data transfers and CUDA streams
+		to enqueue multiple kernels for execution.
 \end{description}
 
 \subsubsection{Xeon Phi}
@@ -1089,13 +1100,14 @@ See \texttt{man bsub}.
 	\item[Which programming concepts do exist?] OpenCL, OpenMP, MPI, OpenACC?
 	\begin{description}[style=nextline]
 		\item[How can OpenMP (4.0) be used?] \hfill
-
 	\end{description}
 
-	\item[Which optimization strategies should be applied?] \hfill
+	\item[Which optimization strategies should be applied?]
 	\begin{description}[style=nextline]
-		\item[Which impact can the PCIe have?] PCIe is a bottleneck for host to Phi data transfer. Adds latency for communication => see GPGPU.
-		\item[Which impact does vectorization have?] Huge impact for the Phi. It has support for FMA-3 with large SIMD vector registers.
+		\item[Which impact can the PCIe have?] PCIe is a bottleneck for host to Phi data transfer.
+			Adds latency for communication => see GPGPU.
+		\item[Which impact does vectorization have?] Huge impact for the Phi.
+			It has support for FMA-3 with large SIMD vector registers.
 	\end{description}
 \end{description}
 
