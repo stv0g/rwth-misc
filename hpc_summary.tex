@@ -884,19 +884,18 @@ See \texttt{man bsub}.
 		\item[What is the difference between caching and non-caching loads?] \hfill
  
 	\end{description}
-	\item[What is shared memory?] CUDA block have dedicated shared memory. This can be used for low-latency inter-thread communication.
+	\item[What is shared memory?] CUDA SM/blocks have dedicated shared memory. This can be used for low-latency inter-thread communication.
 
-	\item[How to avoid CPU/ GPU idling?] Use asynchronous data transfer and CUDA streams to enqueue multiple kernel for inorder execution.
-
+	\item[How to avoid CPU/ GPU idling?] Use asynchronous data transfers and CUDA streams to enqueue multiple kernels for  execution.
 \end{description}
 
 \subsubsection{Xeon Phi}
 
 \begin{description}[style=nextline]
-	\item[How does a Xeon Phi look like?] The Xeon Phi consists of 60 cores with 4-SMT. All cores are connected to their caches which are cache coherent by communicating over a ring bus.
+	\item[How does a Xeon Phi look like?] The Xeon Phi consists of 60 cores with 4-times SMT.
 
 	\begin{description}[style=nextline]
-		\item[How does the memory hierarchy look like?] \hfill
+		\item[How does the memory hierarchy look like?] All cores are connected to caches and dedicated memory by a ring bus. Caches a kept coherent. Data transfer to the host has to be done via DMA. Theres no common address space.
 
 		\item[How many threads/ vector-widths are available?]
 		\begin{description}
@@ -905,7 +904,7 @@ See \texttt{man bsub}.
 		\end{description}
  
 	\end{description}
-	\item[Which programming concepts do exist?] \hfill
+	\item[Which programming concepts do exist?] OpenCL, OpenMP, MPI, OpenACC?
 
 	\begin{description}[style=nextline]
 		\item[How can OpenMP (4.0) be used?] \hfill
@@ -914,9 +913,8 @@ See \texttt{man bsub}.
 	\item[Which optimization strategies should be applied?] \hfill
 
 	\begin{description}[style=nextline]
-		\item[Which impact can the PCIe have?] May be a bottleneck for memory bandwidth. Adds latency for communication.
-		\item[Which impact does vectorization have?] \hfill
-
+		\item[Which impact can the PCIe have?] PCIe is a bottleneck for host to Phi data transfer. Adds latency for communication => see GPGPU.
+		\item[Which impact does vectorization have?] Huge impact for the Phi. It has support for FMA-3 with large SIMD vector registers.
 	\end{description}
 \end{description}
 
