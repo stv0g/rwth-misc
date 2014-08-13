@@ -356,44 +356,86 @@ See \texttt{man bsub}.
 			\item Tianhe-2 (33 PFlops/s)
 			\item Titan (17 PFlops/s)
 		\end{enumerate}
-	\item[What can we read from the performance development as measured in the TOP500?] The TOP500 lists by peak performance $R_max$ in Flops/s (double) measured by a standardized benchmark (LIN/LAPACK). \\
-	Future trends are predictable (exascale computing, architectures).
+	\item[What can we read from the performance development as measured in the
+        TOP500?] The TOP500 lists by peak performance $R_{max}$ in Flops/s (double) measured by a standardized benchmark (LIN/LAPACK). \\
+	Future trends are predictable (exascale computing, architectures).\\
+    At the moment, it takes approximately 11 years to increase performance by 1
+    order of magnitude (1 ExaFlop/s projected for 2019).
 	
-	\item[What does Moore's Law tell you? Is it still valid?] "The number of transistors per chhip doubles around every one to two years." \\
-	Slope is now declining slowy. But mostly still valid.
+	\item[What does Moore's Law tell you? Is it still valid?] "The number of transistors per chip doubles around every one to two years." \\
+	Slope is now declining slowly. But mostly still valid.
 	
-	\item[Why do we have multi-core architectures today?] Clock frequencies can't pushed further due to limited cooling capabilities. \\
+	\item[Why do we have multi-core architectures today?] Clock frequencies can't be pushed further due to limited cooling capabilities. \\
 	Solution: Decrease frequency; increase die-size by putting more cores on a single chip and exploit parallelism.
 	
 \end{description}
 
 \newpage
-\subsection{Energy Efficency}
+\subsection{Energy Efficiency}
 
 \begin{description}[style=nextline]
-	\item[What is the power wall?] 20 to 25 MegaWatt of energy consumption is considered an important barrier for HPC centres.
+	\item[What is the power wall?] 20 to 25 MegaWatt of energy consumption is
+        considered an important barrier for HPC centres.\\
+        The power wall gives us an upper limit on power consumption.
 
-	\item[What is the problem?] To meet the exa-scale goal in 2019, the current trend of energy efficiency isn't sufficient. \\
-	Power consumption will become the dominating cost factor for operate clusters in the future.
+	\item[What is the problem?] 
+    To meet the exa-scale goal in 2019, the current trend of energy efficiency isn't sufficient.
+	Power consumption will become the dominating cost factor for
+    operate clusters in the future, with energy costs surpassing investment costs.
+	\begin{description}[style=nextline]
+		\item[Aspects of energy efficency] Energy efficiency is continuously
+            improving. To meet the exa-scale goal this has to be focused more by using 
+            new architectures (accelerators).
+            At the moment, we have a performance increase of 2 orders of magnitude
+            every 7 years while energy efficiency
+            ($\frac{\text{power consumption}}{\text{Flop/s}}$) decreases by only 1 order
+            of magnitude in the same time.
+            This means power consumption is increasing 1 order of magnitude every 7
+            years.
+
+		\item[Physical descriptions \& limits] 
+            Landauer's principle: "Changing one bit of information needs at
+            least an amount of energy of $ln(2) \cdot k \cdot T$". \\
+		    The current top Green500 systems are about 10 orders of magnitude away from this limitation.
+
+    \end{description}
+
+    \item[How can we benchmark energy efficency?] Measure only the consumption of a
+    single rack (submodule) and extrapolate. Average over different benchmarks. 
 
 	\begin{description}[style=nextline]
-		\item[Aspects of energy efficency] Energy efficiency is continously improving. To meed the exa-scale goal this has to focused more by using new architectures (accelerators).
-
-		\item[Physical descriptions \& limits] Landauer's principle: "Changing one bit of intermation needs at least an amount of energy of $ln(2) \cdot k \cdot T$". \\
-		The current top Green500 systems are about 10 magnitues away from this limitation.
-
+		\item[Advantages \& disadvantages of Green500, SPEC Power] 
+        High variations in idle and during benchmarks and between nodes.
+        Power extrapolation may not be allowed.
+        The Green500 assumes that the computational workload during the Linpack
+        benchmark is well-balanced across all units and that all units are
+        identical and have the same power consumption for the same workload.
+        Those assumptions are however very dangerous and often wrong. Idle and
+        Linpack power consumption can vary from node to node as well as over
+        time.
 	\end{description}
-	\item[How can we benchmark energy efficency?] Measure only the consumption of a single rack and extrapolate. Average over diffrent benchmarks. 
 
-	\begin{description}[style=nextline]
-		\item[Advantages \& disadvantages of Green500, SPEC Power] High variations in idle and during benchmarks and between nodes. Power extrapolation may not be allowed.
-
-	\end{description}
-	\item[What are the architectural aspects of energy efficency?] Current von Neumann architectures were'nt designed with energy efficiency in mind: OoO execution, cache coherency and prefetchers are inefficient. \\
-	Desktop/mobile power saving methods are applied to HPC (C and P-states).
+    \item[What are the architectural aspects of energy efficency?] 
+        Current von Neumann architectures weren't designed with energy 
+        efficiency in mind: 
+        OoO execution, cache coherency and prefetchers are inefficient. \\
+	    Desktop/mobile power saving methods are applied to HPC (C and
+        P-states) C0 is the operating state, everything above is an idle state.
+        With increasing numbers, more and more parts are shut down to conserve
+        energy (at the cost of an increased wakeup time). P-states are all
+        operational states, but they switch between supported frequencies \&
+        voltages to save energy in case maximal performance is not needed
+        $\Longrightarrow$ DVFS.\\
+        There are many parameters that affect energy efficiency: number of
+        cores, clock frequency, prefetcher, SMT, branch prediction, GPU clock
+        frequency, cache size, speed of interconnects. It is important to find
+        sweet spots for those parameters, not only for whole applications but
+        also for each application phase. 
 	
 	\begin{description}[style=nextline]
-		\item[What is dynamic frequency and voltage scaling?] Reduce voltage/frequency during idle times to save energy. Implemented by processor P-states.
+		\item[What is dynamic frequency and voltage scaling?] 
+            Reduce voltage/frequency during idle times to save energy. 
+            Implemented by processor P-states.
 
 	\end{description}
 	\item[What are the future plans to climb the power wall?]
@@ -415,69 +457,98 @@ See \texttt{man bsub}.
 \subsection{Modern Processors}
 
 \begin{description}[style=nextline]
-	\item[What is an ISA?] The for Instruction Set Architecture is the part of an architecture which is visible to the application programmer / compiler.
+	\item[What is an ISA?] The Instruction Set Architecture is the part of an
+        architecture that is visible to the application programmer / compiler.
+        It contains e.g. opcode, operands, registers, addressing modes\dots
 
 	\begin{description}[style=nextline]
 		\item[What are the differences in ISA's?]
 		\begin{itemize}
 			\item Instructions, CISC or RISC
-			\item Memory addressing modes
-			\item Internal storage, registers
+			\item Memory addressing modes (effective of relative)
+			\item Type of Internal storage, e.g. stack, accumulator or
+                general-purpose registers (dominant today)
 			\item Endianess
+            \item Type and size of operands
 		\end{itemize}
 
 		\item[What are the main differences between RISC and CISC?]
 			\begin{description}
 				\item[CISC] Instructions may involve complex operations and are variable in length.
-				\item[RISC] Similiar encoding for all instructions, fixed length. Strict distinction between data loading/storing and manipulation.
+				\item[RISC] Similar encoding for all instructions, fixed length. Strict distinction between data loading/storing and manipulation.
 			\end{description}
 
-		\item[What do we have today?] HPC dominant x86 architectures are CISC based.
+		\item[What do we have today?] HPC dominant x86 architectures are CISC
+            based (but get translated to internal RISC micro instructions).
 	\end{description}
 	
-	\item[What is the basis of today's processors?] They mostly decode CISC instructions to microcode ops (hybrid CISC/RISC).
+	\item[What is the basis of today's processors?]
+        They mostly decode CISC instructions to microcode ops (hybrid CISC/RISC).
+        Modern processors are still based on the Von Neumann architecture,
+        albeit they usually consist of two or more cores.
+        In addition, ALU, control unit, memory controller etc. are all
+        integrated on the core.
  
 	\begin{description}[style=nextline]
-		\item[What are the corresponding bottlenecks?] \hfill
- 
-		\item[How can we overcome these?] \hfill
+		\item[What are the corresponding bottlenecks?]
+            The main bottlenecks today are memory access speed and sequential
+            architecture (SISD)
+		\item[How can we overcome these?]
+            Pipelining, ILP (superscalarity), SIMD - Single Instruction
+            Multiple Data, Prefetching.
  
 	\end{description}
-	\item[What is ILP?] Instruction level parallelism is the potential overlap of instruction execution caused by superscalarity, OoO and pipelines.
+	\item[What is ILP?]
+        Instruction Level Parallelism is the potential overlap of instruction
+        execution caused by superscalarity, OoO and pipelines.
  
 	\begin{description}[style=nextline]
-		\item[What is its influence on today's computers? over time?] Todays CPU's use hardware implmented schedulers, dependency resolvers for microcode operations => very complex controlling.
+		\item[What is its influence on today's computers? over time?]
+            Todays CPU's use hardware implemented schedulers, dependency 
+            resolvers for microcode operations $\Longrightarrow$ very complex
+            controlling.
  
 	\end{description}
 	\item[Pipelining]
 	\begin{description}[style=nextline]
-		\item[How does it work?] Pipelining splits the execution of an instruction in multiple preferably equally long 'stages' which are orthogonal to each other. \\
-		This allows reusing the execution unit of one stage for the next instruction before the first instruction has retired.
+		\item[How does it work?]
+            Pipelining splits the execution of an instruction in multiple
+            preferably equally long 'stages' which are orthogonal to each other. \\
+		    This allows reusing the execution unit of one stage for the next 
+            instruction before the first instruction has retired.
  
-		\item[How to compute possible speedup/throughput?] See formulars.
+		\item[How to compute possible speedup/throughput?] See formulas.
  
 		\item[Problems?]
 		\begin{itemize}
-			\item Pipeline stalls caused by phases of diffrent lengths
+			\item Pipeline stalls caused by phases of different lengths
 			\item Hazards caused by dependent data, instructions, branch-misses...
-			\item Inbalanced CISC instruction decoding/fetching
+			\item Imbalanced CISC instruction decoding/fetching. Instructions
+                are not of equal length and complexity.
 			\item Aliasing...
 		\end{itemize}
  
 	\end{description}
-	\item[Superscalarity] "Execute multiple instructions per cycle."
+	\item[Superscalarity] 
+        "Execute multiple instructions per cycle."
 
 	\begin{description}[style=nextline]
-		\item[What is a superscalar processor?] A superscalar processor consist of multiple FP pipelines, instruction fetchers and decoders.
-		Thereby can execute multiple instructions per cycle and allows a higher pipline utilization and SMT. \\
-		This is a kind of ILP.
+		\item[What is a superscalar processor?]
+            A superscalar processor consist of multiple FP pipelines, 
+            instruction fetchers and decoders.
+		    Thereby can execute multiple instructions per cycle and allows
+            a higher pipeline utilization and SMT. \\
+		    This is a kind of ILP.
 
 	\end{description}
 	\item[SIMD] Single-Instruction-Multiple-Data
 	\begin{description}[style=nextline]
-		\item[How does it work?] Execute a single instruction initiates multiple integer or floating point operations on wide "registers"/"vectors".
+		\item[How does it work?]
+            Execute a single instruction which initiates multiple integer or floating
+            point operations on wide "registers"/"vectors".
 
-		\item[What are the recent vector register widths?] SSE has 128 Bits, AVX has 256 Bits, the Xeon Phi even 512 Bits with AVX2.
+		\item[What are the recent vector register widths?]
+            SSE has 128 Bits, AVX has 256 Bits, the Xeon Phi even 512 Bits with AVX2.
 
 		\item[What to think about if code vectorization is desired?]
 		\begin{itemize}
@@ -487,18 +558,31 @@ See \texttt{man bsub}.
 		\end{itemize}
 		
 	\end{description}
-	\item[Why were caches introduced?] To close the increasing gap between memory bandwidth and processor performance by adding several layers of caches with increasing bandwidth.
+	\item[Why were caches introduced?]
+        To close the increasing gap between memory bandwidth and processor 
+        performance by adding several layers of caches with increasing bandwidth.
 
 	\begin{description}[style=nextline]
-		\item[What is a cache?] It's a high speed memory with low capacity which is usually organized in multiple layers. Commonly the caches are integrated into the CPU dia for high bandwidth.
+		\item[What is a cache?]
+            It's a high speed memory with low capacity which is usually organized
+            in multiple layers. Commonly the caches are integrated into the CPU
+            die for high bandwidth.
 
-		\item[What performance characteristics does it have?] High speed: usually allows multiple transfers per cycle
+		\item[What performance characteristics does it have?]
+            High speed: usually allows multiple transfers per cycle
 
-		\item[When does it makes sense to use a cache?] If compution performance is limited by memory bandwidth ("memory-bound problems").
+		\item[When does it make sense to use a cache?]
+            If computation performance is limited by memory bandwidth 
+            ("memory-bound problems").
 
-		\item[What are cache hits/misses?] Cache hits occur when requested items are currently hold in the cache. Otherwise a cache miss happens.
+		\item[What are cache hits/misses?] 
+            Cache hits occur when requested items are currently held in 
+            the cache. Otherwise a cache miss happens.
 
-		\item[What is the principle of locality?] A item that was referenced will soon be referenced again (temporal). Items that are close to a recentl referenced item are likely to be referenced in near future (spatial).
+		\item[What is the principle of locality?]
+            A item that was referenced will soon be referenced again (temporal). 
+            Items that are close to a recently referenced item are likely to 
+            be referenced in near future (spatial).
 
 	\end{description}
 	\item[Which cache types do exist \& what are their differences?]
@@ -506,17 +590,29 @@ See \texttt{man bsub}.
 		\item Data cache => stores data only
 		\item Instruction cache => stores instructions only
 		\item Unified cache => stores both
-		\item Trace/Mircro-OP cache => stores decoded instructions
+		\item Trace/Micro-OP cache => stores decoded instructions
 	\end{itemize}
 
-	\item[Why is cache coherence important?] Memory contents have to kept consistent across mutliple cores.
+	\item[Why is cache coherence important?]
+        Memory contents have to be kept consistent across multiple cores.
 
 	\begin{description}[style=nextline]
-		\item[How is the coherence achieved?] By using cache invalidation procotols like MESI. \\
-		Write-back/write-through strategies.
+		\item[How is the coherence achieved?] 
+            Two main strategies: directory based (status of physical memory is
+            kept in one place only) and snooping (caches are connected via a
+            broadcast medium ans monitor on that medium).
+            By using cache invalidation protocols like MESI. \\
+		    Write-back/write-through strategies.
+            Write-through: information is written to the cache line as well as
+            the corresponding location in main memory.
+            Write-back: information is only written to the cache and only
+            transfered to main memory if the cache line is evicted.
 
 	\end{description}
-	\item[When is prefetching used?] Prefetching is used to continously fetch data from the main memory. Cache misses usually trigger prefetches of the neighboring cache line.
+	\item[When is prefetching used?]
+        Prefetching is used to continuously fetch data from the main memory
+        $\Longrightarrow$ keep the bus busy.
+        Cache misses usually trigger prefetches of the neighboring cache line.
 
 \end{description}
 
