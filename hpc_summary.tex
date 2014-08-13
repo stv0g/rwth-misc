@@ -229,7 +229,33 @@ All MPI routines return an integer error code!
 
 \subsection{CUDA}
 
-TODO
+
+\subsubsection{General Memory Operations}
+\begin{tabular}{ p{7cm} l }
+	\lstinline$cudaMalloc(&p, n*sizeof(float));$ &  Allocate memory of n floats on GPU, save pointer in p\\
+	\lstinline$cudaFree(p);$& Free memory on GPU, which p is pointing to\\
+	\lstinline$cudaHostMalloc(&p, n*sizeof(float));$ &  Allocate memory of n floats on Host, save pointer in p\\
+	\lstinline$cudaHostFree(p);$& Free memory on Host, which p is pointing to\\
+	\lstinline$cudaMemcpy(d, h, n * sizeof(float),DIR);$ &  memcopy Host => GPU, if DIR = cudaMemcpyHostToDevice \\
+	\lstinline$cudaMemcpy(h, d, n * sizeof(float),DIR);$& GPU => Host if DIR = cudaMemcpyDeviceToHost\\
+	\lstinline$func<<<blockNum, threadNum>>>();$ & Call CUDA Kernel code $func$, with given \# of blocks / threads\\
+\end{tabular}
+
+\subsubsection{Shared Memory}
+\begin{tabular}{ p{7cm} l }
+	\lstinline$__shared__ double[x][y];$ & Static shared memory between threads\\
+	\lstinline$extern __shared__ double[x][y];$ & Dynamic shared memory between threads\\
+	\lstinline$__syncthreads();$ & Synchronize threads after shared memory usage	\\
+\end{tabular}
+
+\subsubsection{Asynchronous operations}
+\begin{tabular}{ p{7cm} l }
+	\lstinline$cudaStream_t st1,st2;$ & Defines streams. Instructions of one stream are exec'd in order.\\
+	\lstinline$cudaStreamCreate(&st1)$& Initialize Stream\\
+	\lstinline$cudaMemcpyAsync(dst,src,size,dir,st1);$& Async memcpy in Stream st1. (nonlbocking)\\
+	\lstinline$cudaStreamSynchronize(st1);$ & Host waits for stream\\
+	\lstinline$cudaDeviceSynchronize();$ & Host waits for everything \\
+\end{tabular}
 
 \subsection{OpenMP}
 
