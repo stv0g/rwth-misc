@@ -266,8 +266,10 @@ All MPI routines return an integer error code!
 	\lstinline$#pragma omp sections$ & Non-iterative worksharing of diffrent sections. \\
 	\lstinline$#pragma omp section$ & \\
 	\lstinline$#pragma omp single$ & Region shall only be executed by a single thread. \\
-	\lstinline$#pragma omp critical$ & Region is executed by all threads but only by a single simultaneously. \\
-	\lstinline$#pragma omp barrier$ & All tasks created by any thread of the current team are guaranteed to complete at barrier exit. \\
+	\lstinline$#pragma omp critical$ & Region is executed by all threads but only
+		by a single simultaneously. \\
+	\lstinline$#pragma omp barrier$ & All tasks created by any thread of the current
+		team are guaranteed to complete at barrier exit. \\
 	\lstinline$#pragma omp taskwait$ & Encountering task suspends until all (direct) child tasks are complete. \\
 	\lstinline$#pragma omp task$ & Defines an explicit task. \\
 	\lstinline$#pragma omp target [data]$ & \\
@@ -359,16 +361,19 @@ See \texttt{man bsub}.
 			\item Titan (17 PFlops/s)
 		\end{enumerate}
 	\item[What can we read from the performance development as measured in the
-        TOP500?] The TOP500 lists by peak performance $R_{max}$ in Flops/s (double) measured by a standardized benchmark (LIN/LAPACK). \\
-	Future trends are predictable (exascale computing, architectures).\\
-    	At the moment, it takes approximately 11 years to increase performance by 3
-    	orders of magnitude (ExaFlop/s projected for 2019).
+		TOP500?] The TOP500 lists by peak performance $R_{max}$
+		in Flops/s (double) measured by a standardized benchmark (LIN/LAPACK). \\
+		Future trends are predictable (exascale computing, architectures).\\
+		At the moment, it takes approximately 11 years to increase performance by 3
+		orders of magnitude (ExaFlop/s projected for 2019).
 	
-	\item[What does Moore's Law tell you? Is it still valid?] "The number of transistors per chip doubles around every one to two years." \\
-	Slope is now declining slowly. But mostly still valid.
+	\item[What does Moore's Law tell you? Is it still valid?]
+		"The number of transistors per chip doubles around every one to two years." \\
+		Slope is now declining slowly. But mostly still valid.
 	
-	\item[Why do we have multi-core architectures today?] Clock frequencies can't be pushed further due to limited cooling capabilities. \\
-	Solution: Decrease frequency; increase die-size by putting more cores on a single chip and exploit parallelism.
+	\item[Why do we have multi-core architectures today?]
+		Clock frequencies can't be pushed further due to limited cooling capabilities. \\
+		Solution: Decrease frequency; increase die-size by putting more cores on a single chip and exploit parallelism.
 	
 \end{description}
 
@@ -798,6 +803,7 @@ See \texttt{man bsub}.
 
 		\item[What are the definitions for bisection bandwidth, diameter \& edge connectivity?] See above.
 	\end{description}
+
 	\item[What are relevant network topologies in HPC?] See table above.
  
 	\begin{description}[style=nextline]
@@ -849,7 +855,8 @@ See \texttt{man bsub}.
 			solve than the others. These threads are called "speeders" \& "laggers". \\
 			There are geometric and graph-based load balancing methods which are statically or dynamic.
  
-		\item[What are differences between SPMD, Master/Worker, Loop Parallelism and Fork/Join? Name a typical example.]
+		\item[What are differences between SPMD, Master/Worker, Loop Parallelism and Fork/Join?
+			Name a typical example.]
 			All these are supporting structures to parallelize algorithms.
 			SPMD and Loop Parallelism execute the same code on multiple UEs.
 			Master/Worker, Fork/Join offer a greater flexibility in this regard.
@@ -940,13 +947,12 @@ See \texttt{man bsub}.
 	\end{description}
 
 	\item[Scoping] There are OpenMP clauses the specifiy the scope (shared or private) of variables.
-
 	\begin{description}[style=nextline]
 		\item[Data sharing clauses] \hfill
 
 	\end{description}
-	\item[Synchronization] \hfill
 
+	\item[Synchronization]
 	\begin{description}[style=nextline]
 		\item[Critical section] \hfill
 
@@ -961,6 +967,7 @@ See \texttt{man bsub}.
 		\item[Important functions] \hfill
 
 	\end{description}
+
 \end{description}
 
 \newpage
@@ -968,34 +975,26 @@ See \texttt{man bsub}.
 
 \begin{description}[style=nextline]
 	\item[Hybrid programming basics] \hfill
-
 	\begin{description}[style=nextline]
 		\item[Why we need hybrid programs] \hfill
-
-		\item[Hybrid programming models] \hfill
- 	
+		\item[Hybrid programming models] \hfill	
 	\end{description}
+
 	\item[Threading modes of MPI] \hfill
- 
-	\begin{description}[style=nextline]
+ 	\begin{description}[style=nextline]
 		\item[What levels of thread support MPI provides] \hfill
-
-		\item[Potential troubles with multithreaded MPI programs] \hfill
- 
+		\item[Potential troubles with multithreaded MPI programs] \hfill 
 	\end{description}
-	\item[Addressing multiple threads within MPI processes] \hfill
 
+	\item[Addressing multiple threads within MPI processes] \hfill
 	\begin{description}[style=nextline]
 		\item[How to work around the flat addressing space of MPI] \hfill
-
 		\item[Using multiple communicators in a hybrid context] \hfill
- 
 	\end{description}
+	
 	\item[Running hybrid programs on the RWTH cluster] \hfill
-
 	\begin{description}[style=nextline]
 		\item[How to properly instruct LSF to run your hybrid job] \hfill
- 	
 	\end{description}
 \end{description}	
 
@@ -1008,24 +1007,20 @@ See \texttt{man bsub}.
 	\item[How does a GPU look like?]
 		A GPGPU is a manycore architecture optimized for high data-parallel throughput.
 		It consists of  multiple streaming processors (SM), which itself consists of many cores.
-
 	\begin{description}[style=nextline]
 		\item[Why do GPUs deliver a good performance per Watt ratio?] GPGPUs have small caches,
 			many low frequency cores and little control logic.
 			Memory is close to the processing unit.
-
 		\item[What is the difference to CPUs?] There are more transistors dedicated to computation
 			instead of controlling. A CPU has large caches with multiple levels,
 			supports OoO execution, sophisticated control logic like speculative
 			execution and hw-scheduling of microops.
- 
 		\item[How does the memory hierarchy look like?] Each SM has seperated shared memories,
 			caches, registers and texture storage.
 			All SM have access to a common LLC and global memory of the GPU.
 			This global memory is seperated from the host.
 			There's no cache coherence for GPU caches!
 			Communication with the host has to be done by DMA transfers.
- 
 		\item[How can the logical programming hierarchy be mapped to the execution model?]
 			The execution model is host-directed.
 			Portions of the code, so called "kernels" are offloaded to the GPU.
@@ -1034,23 +1029,20 @@ See \texttt{man bsub}.
 
 	\item[Which models can be used to program a GPU?] There are special GPU programming APIs
 		like CUDA and more general directive based models like OpenACC/MP.
-
 	\begin{description}[style=nextline]
-		\item[How to handle offloading of regions?] Programmer has to find regions
-			which can be parallelized.
+		\item[How to handle offloading of regions?]
+			Programmer has to manually find regions	which can be parallelized.
 			These "kernels" are compiled to special GPU code and called by the host.
-
 		\item[How to handle data management?] Data transfer has to be done explicitly.
  	
 		\item[What are the main differences?] \hfill
- 
 	\end{description}
+
 	\item[Which impact does the PCIe have?] Usually GPUs are have very fast memory.
 		The PCIe bus isn't fast enough to saturate this memory bandwidth => bottleneck.
 
 	\item[What is branch divergence?] 32 threads are joined to "warps".
 		These warps share a common program counter => branches are serialized inside warps.
-
 	\begin{description}[style=nextline]
 		\item[Which performance impact does it have?]
 			Branch divergancy causes threads which doesn't took a branch to idle.
@@ -1065,7 +1057,6 @@ See \texttt{man bsub}.
 
 	\item[What can be done to saturate the bus?] Maximize PCIe throughput by transfer
 		less data, batch smaller transfers to larger ones.
-
 	\begin{description}[style=nextline]
 		\item[What is coalescing?] \hfill
 		\item[How can it be achieved?] \hfill
