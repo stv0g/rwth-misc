@@ -104,14 +104,13 @@
 \begin{tabular}{l | c c c c }
 	\textbf{Topology} & \textbf{Max degree} & \textbf{Edge connectivity} & \textbf{Diameter} & \textbf{Bisection BW} \\
 	\hline
-	Bus		& 1  & 1   & 1 & B \\
-	Ring		& 2  & 2   & \( \lfloor \frac{N}{2} \rfloor \) & 2B \\
-	Fully connected	& \( \frac{N(N-1)}{2} \) & N-1 & 1 & \( \frac{N^2}{4} \) \\ 
+	Bus		& $1$  & $1$ & $1$ & $B$ \\
+	Ring	& $2$  & $2$ & $\lfloor \frac{N}{2} \rfloor$ & $2B$ \\
+	Fully connected	& $N-1$ & $N-1$ & $1$ & $\frac{N^2}{4}$ \\ 
 	Sw. Fat Tree	& 1 w/o redunancy & depends on design & 2 hierarchy height & depends on design \\
-	Mesh		& 2d & d   & \( \sum_{i=1}^d (N_i - 1) \) & \( B ( \prod_{i=1}^{d-1} N_i ) \) \\
-	Torus		& 2d & 2d  & \( \sum_{i=1}^d \lfloor \frac{N}{2} \rfloor  \) & \( 2B ( \prod_{i=1}^{d-1} N_i ) \) \\
-
-	Hypercube	& d  & d   & d & \( B2^{d-1} \) \\ 
+	Mesh	& $2d$ & $d$ & $\sum_{i=1}^d (N_i - 1)$ & $B ( \prod_{i=1}^{d-1} N_i )$ \\
+	Torus	& $2d$ & $2d$ & $\sum_{i=1}^d \lfloor \frac{N}{2} \rfloor$ & $2B ( \prod_{i=1}^{d-1} N_i )$ \\
+	Hypercube	& $d$ & $d$ & $d$ & $B2^{d-1}$ \\ 
 \end{tabular}
 
 \section{Balance, Lightspeed}
