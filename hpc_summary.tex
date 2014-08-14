@@ -1074,28 +1074,43 @@ See \texttt{man bsub}.
 \subsubsection{Xeon Phi}
 
 \begin{description}[style=nextline]
-	\item[How does a Xeon Phi look like?] The Xeon Phi consists of 60 cores with 4-times SMT.
+	\item[How does a Xeon Phi look like?]
+		The Xeon Phi consists of 60 cores with 4-fold SMT,
+		has a clock frequency of 1090~Mhz
+		and a peak performance of about 1 TFlop/s.
 	\begin{description}[style=nextline]
-		\item[How does the memory hierarchy look like?] All cores are connected
-			to caches and dedicated memory by a ring bus. Caches a kept coherent.
-			Data transfer to the host has to be done via DMA.
-			Theres no common address space.
+		\item[How does the memory hierarchy look like?]
+			All cores are connected to their own L1/L2 caches by a ring bus.
+			There's a common Memory and I/O interface which also connected to ring bus
+			and used to access the global GDDR5 RAM.
+			Caches a kept coherent. Data transfer to the host has to be done via DMA.
+			There's no common address space with the host.
 
 		\item[How many threads/ vector-widths are available?]
 		\begin{description}
 			\item[Threads] 60 cores * 4 threads = 240 threads
-			\item[Vector-width] AVX-512 has 512 bits per vector (extension of AVX2, MIC only)
+			\item[Vector-width] AVX-512 has 512 bits per vector
+				(extension of AVX2, MIC only).
 		\end{description}
 	\end{description}
 
-	\item[Which programming concepts do exist?] OpenCL, OpenMP, MPI, OpenACC?
+	\item[Which programming concepts do exist?] OpenMP/CL/ACC, MPI and Posix threads.
+		The Phi is a slightly modified x86 architecture and can be programmed used
+		like a normal x86 system. Intel offers propriatary language offloading extensions (LEO)
+		for their own C compiler.
 	\begin{description}[style=nextline]
-		\item[How can OpenMP (4.0) be used?] \hfill
+		\item[How can OpenMP (4.0) be used?] The recent OpenMP spec adds new
+			directives (\texttt{target} and \texttt{teams}) which can be used
+			to offload parts of the code.
+			This concept has been adopted from the OpenACC
+			standard which can be considered to be a testbed for OpenMP.
 	\end{description}
 
 	\item[Which optimization strategies should be applied?]
+		Massive SIMD vectorization, check data aligment (SoA, AoS), avoid aliasing.
 	\begin{description}[style=nextline]
-		\item[Which impact can the PCIe have?] PCIe is a bottleneck for host to Phi data transfer.
+		\item[Which impact can the PCIe have?]
+			PCIe is a bottleneck for host to Phi data transfer.
 			Adds latency for communication => see GPGPU.
 		\item[Which impact does vectorization have?] Huge impact for the Phi.
 			It has support for FMA-3 with large SIMD vector registers.
