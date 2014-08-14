@@ -948,24 +948,19 @@ See \texttt{man bsub}.
 
 	\item[Scoping] There are OpenMP clauses the specifiy the scope (shared or private) of variables.
 	\begin{description}[style=nextline]
-		\item[Data sharing clauses] \hfill
-
+		\item[Data sharing clauses] See API reference above.
 	\end{description}
 
 	\item[Synchronization]
 	\begin{description}[style=nextline]
-		\item[Critical section] \hfill
+		\item[Critical section] Use \lstinline$#pragma omp critical$ directive.
+		\item[Reduction clause] Use \lstinline$reduction(operation:var-list)$ clause.
+ 		\item[Team and Task-Barriers] Use \lstinline$#pragma omp barrier$ and \lstinline$#pragma omp taskwait$ directives.
+ 	\end{description} 
 
-		\item[Reduction clause] \hfill
- 
-		\item[Team and Task-Barriers] \hfill
- 
-	\end{description} 
-	\item[Runtime library] \hfill
-
+	\item[Runtime library]
 	\begin{description}[style=nextline]
-		\item[Important functions] \hfill
-
+		\item[Important functions] See API reference above.
 	\end{description}
 
 \end{description}
