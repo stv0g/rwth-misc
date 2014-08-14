@@ -183,7 +183,7 @@ All MPI routines return an integer error code!
 	\lstinline$     ?rbuf?, §rcnt§, §rtype§, §root§, §cm§)$ & \\
 	\lstinline$MPI_Allgather(...)$ & \\
 	\lstinline$MPI_Alltoall()$ & \\
-	\lstinline$MPI_Redude()$ & \\
+	\lstinline$MPI_Reduce()$ & \\
 	\lstinline$MPI_Allreduce(...)$ & \\
 \end{tabular}
 
@@ -204,7 +204,7 @@ All MPI routines return an integer error code!
 
 \subsubsection{Virtual topologies}
 \begin{tabular}{ p{8cm} l }
-	\lstinline$MPI_Cart_create(...)$ & \\
+	\lstinline$MPI_Cart_create(..)$ & Creates a new cartesian cm from given old one.\\
 	\lstinline$MPI_Cart_rank(...)$ & \\
 	\lstinline$MPI_Cart_shift(...)$ & \\
 	\lstinline$MPI_Cart_sub(...)$ & \\
